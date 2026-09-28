@@ -54,9 +54,7 @@ export function QueueTable({
     {
       key: 'status',
       header: 'Status',
-      render: (entry) => (
-        <Badge tone={STATUS_TONES[entry.status]}>{entry.encounter_status_label}</Badge>
-      ),
+      render: (entry) => <Badge tone={STATUS_TONES[entry.status]}>{statusLabelOf(entry)}</Badge>,
     },
     ...(showWaitingTime ? [waitingColumn(now)] : []),
     {
@@ -76,6 +74,11 @@ export function QueueTable({
       emptyState={<EmptyState icon={<Inbox size={22} />} title={emptyTitle} />}
     />
   );
+}
+
+/** Situação na fila; senhas finalizadas mostram o desfecho do atendimento (ex.: Atendido). */
+function statusLabelOf(entry: QueueEntry): string {
+  return entry.status === 'FINISHED' ? entry.encounter_status_label : entry.status_label;
 }
 
 function waitingColumn(now: Date): TableColumn<QueueEntry> {

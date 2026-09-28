@@ -67,42 +67,40 @@ export function ReceptionDashboard(): ReactElement {
       <QueueKpis summary={summarizeQueue(entries, now)} waitingLabel="Na fila da recepção" />
       {operation.errorMessage && <Alert tone="error">{operation.errorMessage}</Alert>}
       {operation.successMessage && <Alert tone="success">{operation.successMessage}</Alert>}
-      <div className={styles.columns}>
-        <Card title="Fila da recepção" icon={<ListOrdered size={20} />}>
-          {queue.isLoading ? (
-            <Loading />
-          ) : (
-            <QueueTable
-              caption="Fila da recepção"
-              entries={entries}
-              now={now}
-              showProfessional
-              emptyTitle="Nenhum paciente aguardando na recepção"
-              renderActions={(entry) => (
-                <QueueRowActions
-                  entry={entry}
-                  busyKey={operation.busyKey}
-                  canCall={canCall}
-                  hasDestination={Boolean(destination)}
-                  onCall={callTicket}
-                  onForward={canForward ? forwardTicket : undefined}
-                />
-              )}
-            />
-          )}
-        </Card>
-        <div className={styles.stack}>
-          {canCall && (
-            <CallPanel
-              nextEntry={nextWaitingEntry(entries)}
-              destinationLabel={destination}
-              now={now}
-              isCalling={operation.busyKey?.startsWith('call-') ?? false}
-              onCall={callTicket}
-            />
-          )}
-          <RecentCallsCard calls={calls.data ?? []} />
-        </div>
+      <Card title="Fila da recepção" icon={<ListOrdered size={20} />}>
+        {queue.isLoading ? (
+          <Loading />
+        ) : (
+          <QueueTable
+            caption="Fila da recepção"
+            entries={entries}
+            now={now}
+            showProfessional
+            emptyTitle="Nenhum paciente aguardando na recepção"
+            renderActions={(entry) => (
+              <QueueRowActions
+                entry={entry}
+                busyKey={operation.busyKey}
+                canCall={canCall}
+                hasDestination={Boolean(destination)}
+                onCall={callTicket}
+                onForward={canForward ? forwardTicket : undefined}
+              />
+            )}
+          />
+        )}
+      </Card>
+      <div className={styles.pair}>
+        {canCall && (
+          <CallPanel
+            nextEntry={nextWaitingEntry(entries)}
+            destinationLabel={destination}
+            now={now}
+            isCalling={operation.busyKey?.startsWith('call-') ?? false}
+            onCall={callTicket}
+          />
+        )}
+        <RecentCallsCard calls={calls.data ?? []} />
       </div>
     </>
   );
