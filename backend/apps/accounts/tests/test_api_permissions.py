@@ -60,3 +60,27 @@ def test_anonymous_request_is_rejected_without_audit():
 
     assert response.status_code in (401, 403)
     assert not AuditEvent.objects.exists()
+
+
+class AnyOfProtectedView(APIView):
+    permission_classes = (HasRequiredAccessPermission,)
+    required_permissions = {
+        "GET": (AccessPermission.CLINICAL_QUEUE_CALL_OWN, AccessPermission.CLINICAL_QUEUE_CALL_ANY)
+    }
+
+    def get(self, request):
+        return Response({"ok": True})
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("role", "expected_status"),
+    [(UserRole.MEDICO, 200), (UserRole.GESTOR, 200), (UserRole.ATENDENTE, 403)],
+)
+def test_tuple_of_permissions_accepts_any_of_them(role, expected_status):
+    request = APIRequestFactory().get("/api/v1/teste/")
+    force_authenticate(request, user=create_user(f"user.{role}", role))
+
+    response = AnyOfProtectedView.as_view()(request)
+
+    assert response.status_code == expected_status

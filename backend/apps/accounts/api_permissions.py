@@ -11,20 +11,28 @@ from apps.accounts.models import User
 from apps.audit.actions import AuditAction
 from apps.audit.services import record_request_audit_event
 
+# Uma permissão, ou uma tupla em que qualquer uma das permissões é suficiente
+# (ex.: chamar da própria fila OU de qualquer fila).
+RequiredPermission = AccessPermission | tuple[AccessPermission, ...]
 
-def get_required_permission(view: APIView, http_method: str) -> AccessPermission | None:
-    """Retorna a permissão exigida pela view para o método HTTP, se declarada."""
-    required: Mapping[str, AccessPermission] = getattr(view, "required_permissions", {})
-    return required.get(http_method)
+
+def get_required_permissions(view: APIView, http_method: str) -> tuple[AccessPermission, ...]:
+    """Permissões aceitas pela view para o método HTTP; vazio quando não declarado."""
+    declared: Mapping[str, RequiredPermission] = getattr(view, "required_permissions", {})
+    required = declared.get(http_method)
+    if required is None:
+        return ()
+    return required if isinstance(required, tuple) else (required,)
 
 
 class HasRequiredAccessPermission(BasePermission):
     """
     Exige que o perfil do usuário possua a permissão declarada pela view.
 
-    A view declara `required_permissions = {"GET": AccessPermission.X, ...}`.
-    Métodos não declarados são negados (negado por padrão). Negações de
-    usuários autenticados geram evento de auditoria.
+    A view declara `required_permissions = {"GET": AccessPermission.X, ...}`;
+    uma tupla indica que qualquer uma das permissões basta. Métodos não
+    declarados são negados (negado por padrão). Negações de usuários
+    autenticados geram evento de auditoria.
     """
 
     message = "Seu perfil não tem permissão para esta operação."
@@ -34,8 +42,8 @@ class HasRequiredAccessPermission(BasePermission):
         if not isinstance(user, User):
             return False
 
-        required = get_required_permission(view, request.method or "")
-        if required is not None and user_has_permission(user, required):
+        required = get_required_permissions(view, request.method or "")
+        if any(user_has_permission(user, permission) for permission in required):
             return True
 
         record_request_audit_event(
@@ -45,7 +53,7 @@ class HasRequiredAccessPermission(BasePermission):
             metadata={
                 "method": request.method,
                 "path": request.path,
-                "required_permission": str(required) if required else None,
+                "required_permission": ",".join(required) or None,
             },
         )
         return False
