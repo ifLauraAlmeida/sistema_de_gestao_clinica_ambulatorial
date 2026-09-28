@@ -46,3 +46,14 @@ export function summarizeQueue(entries: QueueEntry[], now: Date): QueueSummary {
 export function nextWaitingEntry(entries: QueueEntry[]): QueueEntry | undefined {
   return entries.find((entry) => entry.status === 'WAITING');
 }
+
+/**
+ * Senha selecionada para chamada: a escolhida pelo usuário, se ainda estiver na
+ * fila; caso contrário, a próxima aguardando.
+ */
+export function resolveSelectedEntry(
+  entries: QueueEntry[],
+  selectedId: string | null,
+): QueueEntry | undefined {
+  return entries.find((entry) => entry.id === selectedId) ?? nextWaitingEntry(entries);
+}

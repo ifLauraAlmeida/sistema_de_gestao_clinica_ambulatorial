@@ -1,8 +1,8 @@
 import type { ReactElement } from 'react';
 import { ArrowRightCircle, CheckCircle2, Megaphone, RotateCcw } from 'lucide-react';
-import { Button } from '../../components/ui/Button';
+import { Button } from '../ui/Button';
 import type { QueueEntry } from '../../types/queue';
-import styles from './Dashboard.module.css';
+import styles from './Queue.module.css';
 
 interface QueueRowActionsProps {
   entry: QueueEntry;

@@ -42,7 +42,9 @@ export class FakeBackend {
     const headers = { ...(init.headers as Record<string, string> | undefined) };
     this.requests.push({ method, path, headers, body });
 
-    const handler = this.routes.get(`${method} ${path}`);
+    // Rota exata tem prioridade; senão casa o caminho sem querystring.
+    const handler =
+      this.routes.get(`${method} ${path}`) ?? this.routes.get(`${method} ${path.split('?')[0]}`);
     const result = handler ? handler(body) : { status: 404, body: notFoundBody(path) };
     const payload = result.body === undefined ? null : JSON.stringify(result.body);
     return new Response(payload, {

@@ -1,11 +1,11 @@
 import type { ReactElement, ReactNode } from 'react';
 import { Inbox } from 'lucide-react';
-import { Badge, type BadgeTone } from '../../components/ui/Badge';
-import { EmptyState } from '../../components/ui/EmptyState';
-import { Table, type TableColumn } from '../../components/ui/Table';
+import { Badge, type BadgeTone } from '../ui/Badge';
+import { EmptyState } from '../ui/EmptyState';
+import { Table, type TableColumn } from '../ui/Table';
 import type { QueueEntry, QueueEntryStatus } from '../../types/queue';
 import { waitTone, waitingMinutes } from '../../utils/queueMetrics';
-import styles from './Dashboard.module.css';
+import styles from './Queue.module.css';
 
 const STATUS_TONES: Record<QueueEntryStatus, BadgeTone> = {
   WAITING: 'info',

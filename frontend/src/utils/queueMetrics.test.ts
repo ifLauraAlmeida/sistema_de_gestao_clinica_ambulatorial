@@ -1,28 +1,19 @@
 import { describe, expect, it } from 'vitest';
+import { buildQueueEntry } from '../test/domainFixtures';
 import type { QueueEntry } from '../types/queue';
-import { nextWaitingEntry, summarizeQueue, waitTone, waitingMinutes } from './queueMetrics';
+import {
+  nextWaitingEntry,
+  resolveSelectedEntry,
+  summarizeQueue,
+  waitTone,
+  waitingMinutes,
+} from './queueMetrics';
 
 const NOW = new Date('2026-09-28T13:00:00Z');
 
 function entry(id: string, minutesAgo: number, status: QueueEntry['status']): QueueEntry {
-  return {
-    id,
-    encounter_id: `enc-${id}`,
-    queue_type: 'RECEPTION',
-    ticket_code: `GINE0${id}`,
-    patient_name: 'Paciente Fictício',
-    specialty_name: 'Ginecologia',
-    professional_name: 'Profissional Fictício',
-    status,
-    status_label: '',
-    encounter_status: 'CHECK_IN_REALIZADO',
-    encounter_status_label: '',
-    entered_at: new Date(NOW.getTime() - minutesAgo * 60_000).toISOString(),
-    finished_at: null,
-    last_call_destination: null,
-    last_called_at: null,
-    last_call_attempt: null,
-  };
+  const enteredAt = new Date(NOW.getTime() - minutesAgo * 60_000).toISOString();
+  return buildQueueEntry({ id, status, entered_at: enteredAt });
 }
 
 describe('queueMetrics', () => {
@@ -50,5 +41,12 @@ describe('queueMetrics', () => {
 
   it('resume fila vazia sem dividir por zero', () => {
     expect(summarizeQueue([], NOW).averageWaitMinutes).toBe(0);
+  });
+
+  it('usa a senha escolhida e volta para a próxima quando ela sai da fila', () => {
+    const entries = [entry('1', 10, 'WAITING'), entry('2', 5, 'WAITING')];
+
+    expect(resolveSelectedEntry(entries, '2')?.id).toBe('2');
+    expect(resolveSelectedEntry(entries, 'removida')?.id).toBe('1');
   });
 });

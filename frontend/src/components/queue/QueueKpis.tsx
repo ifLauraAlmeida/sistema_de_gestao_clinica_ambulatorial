@@ -1,8 +1,8 @@
 import type { ReactElement } from 'react';
 import { AlertTriangle, Clock, Megaphone, Users } from 'lucide-react';
-import { KpiCard } from '../../components/ui/KpiCard';
+import { KpiCard } from '../ui/KpiCard';
 import { LONG_WAIT_MINUTES, type QueueSummary } from '../../utils/queueMetrics';
-import styles from './Dashboard.module.css';
+import grid from '../../layouts/PageGrid.module.css';
 
 interface QueueKpisProps {
   summary: QueueSummary;
@@ -11,7 +11,7 @@ interface QueueKpisProps {
 
 export function QueueKpis({ summary, waitingLabel }: QueueKpisProps): ReactElement {
   return (
-    <div className={styles.kpis}>
+    <div className={grid.kpis}>
       <KpiCard
         icon={<Users size={26} />}
         label={waitingLabel}

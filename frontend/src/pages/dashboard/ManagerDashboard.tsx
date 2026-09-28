@@ -10,10 +10,10 @@ import { listClinicalQueue, listReceptionQueue } from '../../services/queues';
 import type { QueueEntry } from '../../types/queue';
 import { summarizeQueue } from '../../utils/queueMetrics';
 import { firstNameOf } from '../../utils/userAccess';
-import { QUEUE_REFRESH_INTERVAL_MS } from './queueRefresh';
-import { QueueTable } from './QueueTable';
-import { TodayBadge } from './TodayBadge';
-import styles from './Dashboard.module.css';
+import { QUEUE_REFRESH_INTERVAL_MS } from '../../components/queue/queueRefresh';
+import { QueueTable } from '../../components/queue/QueueTable';
+import { TodayBadge } from '../../components/queue/TodayBadge';
+import styles from '../../layouts/PageGrid.module.css';
 
 const loadActiveClinical = (): Promise<QueueEntry[]> => listClinicalQueue('active');
 const loadInactiveClinical = (): Promise<QueueEntry[]> => listClinicalQueue('inactive');

@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import { CalendarDays } from 'lucide-react';
 import { formatLongDate } from '../../utils/dateTime';
-import styles from './Dashboard.module.css';
+import styles from './Queue.module.css';
 
 export function TodayBadge({ now }: { now: Date }): ReactElement {
   return (

@@ -1,11 +1,11 @@
 import type { ReactElement } from 'react';
 import { History } from 'lucide-react';
-import { Card } from '../../components/ui/Card';
-import { EmptyState } from '../../components/ui/EmptyState';
-import { Table } from '../../components/ui/Table';
+import { Card } from '../ui/Card';
+import { EmptyState } from '../ui/EmptyState';
+import { Table } from '../ui/Table';
 import type { QueueCall } from '../../types/queue';
 import { formatTime } from '../../utils/dateTime';
-import styles from './Dashboard.module.css';
+import styles from './Queue.module.css';
 
 export function RecentCallsCard({ calls }: { calls: QueueCall[] }): ReactElement {
   return (

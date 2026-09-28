@@ -1,4 +1,4 @@
-import { useCallback, type ReactElement } from 'react';
+import { useCallback, useState, type ReactElement } from 'react';
 import { CheckCircle2, Stethoscope } from 'lucide-react';
 import { Alert } from '../../components/ui/Alert';
 import { Card } from '../../components/ui/Card';
@@ -10,15 +10,15 @@ import { useNow } from '../../hooks/useNow';
 import { useQueueOperation } from '../../hooks/useQueueOperation';
 import { callClinicalTicket, completeEncounter, listClinicalQueue } from '../../services/queues';
 import type { QueueEntry } from '../../types/queue';
-import { nextWaitingEntry, summarizeQueue } from '../../utils/queueMetrics';
+import { resolveSelectedEntry, summarizeQueue } from '../../utils/queueMetrics';
 import { firstNameOf } from '../../utils/userAccess';
-import { CallPanel } from './CallPanel';
-import { QUEUE_REFRESH_INTERVAL_MS } from './queueRefresh';
-import { QueueKpis } from './QueueKpis';
-import { QueueRowActions } from './QueueRowActions';
-import { QueueTable } from './QueueTable';
-import { TodayBadge } from './TodayBadge';
-import styles from './Dashboard.module.css';
+import { CallPanel } from '../../components/queue/CallPanel';
+import { QUEUE_REFRESH_INTERVAL_MS } from '../../components/queue/queueRefresh';
+import { QueueKpis } from '../../components/queue/QueueKpis';
+import { QueueRowActions } from '../../components/queue/QueueRowActions';
+import { QueueTable } from '../../components/queue/QueueTable';
+import { TodayBadge } from '../../components/queue/TodayBadge';
+import styles from '../../layouts/PageGrid.module.css';
 
 const loadActiveQueue = (): Promise<QueueEntry[]> => listClinicalQueue('active');
 const loadInactiveQueue = (): Promise<QueueEntry[]> => listClinicalQueue('inactive');
@@ -36,6 +36,7 @@ export function DoctorDashboard(): ReactElement {
     await Promise.all([reloadActive(), reloadInactive()]);
   }, [reloadActive, reloadInactive]);
   const operation = useQueueOperation(reloadAll);
+  const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
 
   const activeEntries = active.data ?? [];
   const room = user.active_work_session?.station.name;
@@ -62,47 +63,47 @@ export function DoctorDashboard(): ReactElement {
       <QueueKpis summary={summarizeQueue(activeEntries, now)} waitingLabel="Na minha fila" />
       {operation.errorMessage && <Alert tone="error">{operation.errorMessage}</Alert>}
       {operation.successMessage && <Alert tone="success">{operation.successMessage}</Alert>}
-      <div className={styles.columns}>
-        <div className={styles.stack}>
-          <Card title="Minha fila ativa" icon={<Stethoscope size={20} />}>
-            {active.isLoading ? (
-              <Loading />
-            ) : (
-              <QueueTable
-                caption="Minha fila ativa"
-                entries={activeEntries}
-                now={now}
-                emptyTitle="Nenhum paciente na sua fila"
-                renderActions={(entry) => (
-                  <QueueRowActions
-                    entry={entry}
-                    busyKey={operation.busyKey}
-                    canCall
-                    hasDestination={Boolean(room)}
-                    onCall={callTicket}
-                    onComplete={completeTicket}
-                  />
-                )}
+      <Card title="Minha fila ativa" icon={<Stethoscope size={20} />}>
+        {active.isLoading ? (
+          <Loading />
+        ) : (
+          <QueueTable
+            caption="Minha fila ativa"
+            entries={activeEntries}
+            now={now}
+            emptyTitle="Nenhum paciente na sua fila"
+            renderActions={(entry) => (
+              <QueueRowActions
+                entry={entry}
+                busyKey={operation.busyKey}
+                canCall
+                hasDestination={Boolean(room)}
+                onCall={callTicket}
+                onComplete={completeTicket}
               />
             )}
-          </Card>
-          <Card title="Atendidos hoje (fila inativa)" icon={<CheckCircle2 size={20} />}>
-            <QueueTable
-              caption="Fila inativa"
-              entries={inactive.data ?? []}
-              now={now}
-              showWaitingTime={false}
-              emptyTitle="Nenhum atendimento finalizado hoje"
-            />
-          </Card>
-        </div>
+          />
+        )}
+      </Card>
+      <div className={styles.pair}>
         <CallPanel
-          nextEntry={nextWaitingEntry(activeEntries)}
+          entries={activeEntries}
+          selectedEntry={resolveSelectedEntry(activeEntries, selectedEntryId)}
           destinationLabel={room}
           now={now}
           isCalling={operation.busyKey?.startsWith('call-') ?? false}
+          onSelect={setSelectedEntryId}
           onCall={callTicket}
         />
+        <Card title="Atendidos hoje (fila inativa)" icon={<CheckCircle2 size={20} />}>
+          <QueueTable
+            caption="Fila inativa"
+            entries={inactive.data ?? []}
+            now={now}
+            showWaitingTime={false}
+            emptyTitle="Nenhum atendimento finalizado hoje"
+          />
+        </Card>
       </div>
     </>
   );
