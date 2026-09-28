@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     "rest_framework",
     "channels",
     "apps.core",
+    "apps.accounts",
 ]
+
+AUTH_USER_MODEL = "accounts.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
