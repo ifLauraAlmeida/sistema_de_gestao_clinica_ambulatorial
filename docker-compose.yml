@@ -44,7 +44,9 @@ services:
   frontend:
     build:
       context: ./frontend
-    env_file: .env
+    # Somente o necessário: o frontend não recebe segredos do backend.
+    environment:
+      VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://backend:8000}
     volumes:
       - ./frontend:/app:z
       # Mantém as dependências instaladas na imagem, sem sobrescrever pelo host.
