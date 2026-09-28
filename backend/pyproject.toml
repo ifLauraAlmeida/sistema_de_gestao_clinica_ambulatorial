@@ -59,7 +59,7 @@ disallow_incomplete_defs = true
 warn_unused_ignores = true
 warn_redundant_casts = true
 no_implicit_optional = true
-exclude = ["apps/.*/migrations/", "apps/.*/tests/"]
+exclude = ["apps/.*/migrations/", "apps/.*/tests/", "conftest.py"]
 
 # django-environ não publica anotações de tipo.
 [[tool.mypy.overrides]]
