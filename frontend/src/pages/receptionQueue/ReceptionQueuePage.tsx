@@ -1,5 +1,12 @@
-import { useCallback, type ReactElement } from 'react';
+import { useCallback, useState, type ReactElement } from 'react';
 import { ListOrdered } from 'lucide-react';
+import { CallPanel } from '../../components/queue/CallPanel';
+import { QueueKpis } from '../../components/queue/QueueKpis';
+import { QueueRowActions } from '../../components/queue/QueueRowActions';
+import { QueueTable } from '../../components/queue/QueueTable';
+import { RecentCallsCard } from '../../components/queue/RecentCallsCard';
+import { TodayBadge } from '../../components/queue/TodayBadge';
+import { QUEUE_REFRESH_INTERVAL_MS } from '../../components/queue/queueRefresh';
 import { Alert } from '../../components/ui/Alert';
 import { Card } from '../../components/ui/Card';
 import { Loading } from '../../components/ui/Loading';
@@ -15,30 +22,28 @@ import {
   listReceptionQueue,
 } from '../../services/queues';
 import type { QueueEntry } from '../../types/queue';
-import { nextWaitingEntry, summarizeQueue } from '../../utils/queueMetrics';
-import { firstNameOf, hasAnyPermission } from '../../utils/userAccess';
-import { CallPanel } from './CallPanel';
-import { QUEUE_REFRESH_INTERVAL_MS } from './queueRefresh';
-import { QueueKpis } from './QueueKpis';
-import { QueueRowActions } from './QueueRowActions';
-import { QueueTable } from './QueueTable';
-import { RecentCallsCard } from './RecentCallsCard';
-import { TodayBadge } from './TodayBadge';
-import styles from './Dashboard.module.css';
+import { resolveSelectedEntry, summarizeQueue } from '../../utils/queueMetrics';
+import { hasAnyPermission } from '../../utils/userAccess';
+import grid from '../../layouts/PageGrid.module.css';
 
-/** Visão operacional da recepção: somente a fila da recepção (Telas 02 e 06). */
-export function ReceptionDashboard(): ReactElement {
+const REFRESH = { refreshIntervalMs: QUEUE_REFRESH_INTERVAL_MS };
+
+/**
+ * Fila da recepção (Tela 06, somente recepção): chamada para o guichê atual,
+ * rechamada e encaminhamento para a fila do profissional.
+ */
+export function ReceptionQueuePage(): ReactElement {
   const user = useCurrentUser();
   const now = useNow();
-  const refresh = { refreshIntervalMs: QUEUE_REFRESH_INTERVAL_MS };
-  const queue = useApiResource(listReceptionQueue, refresh);
-  const calls = useApiResource(listRecentReceptionCalls, refresh);
+  const queue = useApiResource(listReceptionQueue, REFRESH);
+  const calls = useApiResource(listRecentReceptionCalls, REFRESH);
   const { reload: reloadQueue } = queue;
   const { reload: reloadCalls } = calls;
   const reloadAll = useCallback(async () => {
     await Promise.all([reloadQueue(), reloadCalls()]);
   }, [reloadQueue, reloadCalls]);
   const operation = useQueueOperation(reloadAll);
+  const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
 
   const entries = queue.data ?? [];
   const destination = user.active_work_session?.station.name;
@@ -60,7 +65,7 @@ export function ReceptionDashboard(): ReactElement {
   return (
     <>
       <PageHeader
-        title={`Olá, ${firstNameOf(user)}!`}
+        title="Fila da recepção"
         subtitle="Acompanhe a fila da recepção e realize as chamadas."
         actions={<TodayBadge now={now} />}
       />
@@ -90,13 +95,15 @@ export function ReceptionDashboard(): ReactElement {
           />
         )}
       </Card>
-      <div className={styles.pair}>
+      <div className={grid.pair}>
         {canCall && (
           <CallPanel
-            nextEntry={nextWaitingEntry(entries)}
+            entries={entries}
+            selectedEntry={resolveSelectedEntry(entries, selectedEntryId)}
             destinationLabel={destination}
             now={now}
             isCalling={operation.busyKey?.startsWith('call-') ?? false}
+            onSelect={setSelectedEntryId}
             onCall={callTicket}
           />
         )}
