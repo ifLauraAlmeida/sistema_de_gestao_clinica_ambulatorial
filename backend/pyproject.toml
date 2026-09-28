@@ -73,4 +73,5 @@ django_settings_module = "config.settings.test"
 DJANGO_SETTINGS_MODULE = "config.settings.test"
 python_files = ["test_*.py"]
 pythonpath = ["."]
-addopts = "--strict-markers"
+# `--ds` tem precedência sobre DJANGO_SETTINGS_MODULE vindo do ambiente/.env.
+addopts = "--strict-markers --ds=config.settings.test"
