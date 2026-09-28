@@ -12,7 +12,11 @@ from apps.encounters.models import EncounterStatus
 from apps.encounters.services.status_transitions import change_encounter_status
 from apps.queues.models import QueueCall, QueueEntry, QueueEntryStatus, QueueType
 from apps.queues.policies import can_call_queue_entry, get_call_station_type
-from apps.queues.services.queue_entry_lookup import ensure_entry_is_active, lock_queue_entry
+from apps.queues.services.queue_entry_lookup import (
+    ensure_entry_is_active,
+    find_queue_entry,
+    lock_queue_entry,
+)
 from apps.workstations.models import WorkSession
 from apps.workstations.selectors import get_open_work_session_of_type
 
@@ -33,9 +37,10 @@ def call_queue_ticket(
     Exemplo:
         call_queue_ticket(entrada.id, QueueType.RECEPTION, caller=atendente)
     """
+    _ensure_can_call(caller, find_queue_entry(entry_id, queue_type), ip_address)
+
     with transaction.atomic():
         entry = lock_queue_entry(entry_id, queue_type)
-        _ensure_can_call(caller, entry, ip_address)
         ensure_entry_is_active(entry)
         work_session = _require_work_session(caller, entry)
         call = _register_call(entry, caller, work_session)
@@ -56,6 +61,7 @@ def call_queue_ticket(
 
 
 def _ensure_can_call(caller: User, entry: QueueEntry, ip_address: str | None) -> None:
+    # Executado fora da transação: a auditoria da negação precisa persistir.
     if can_call_queue_entry(caller, entry):
         return
     record_audit_event(

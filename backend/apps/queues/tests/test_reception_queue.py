@@ -123,3 +123,13 @@ def test_medico_cannot_view_or_call_reception_queue(client_for, medico, receptio
     assert client.get(QUEUE_URL).status_code == 403
     assert client.post(_call_url(reception_entry)).status_code == 403
     assert client.post(f"{QUEUE_URL}{reception_entry.id}/forward/").status_code == 403
+
+
+def test_denied_call_is_audited_even_though_operation_is_rolled_back(medico, reception_entry):
+    from apps.core.exceptions import AccessDeniedError
+    from apps.queues.services.call_ticket import call_queue_ticket
+
+    with pytest.raises(AccessDeniedError):
+        call_queue_ticket(reception_entry.id, QueueType.RECEPTION, caller=medico)
+
+    assert AuditEvent.objects.filter(action="ACCESS_DENIED", user=medico).exists()
