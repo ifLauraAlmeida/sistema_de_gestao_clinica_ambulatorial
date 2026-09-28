@@ -11,6 +11,7 @@ api_v1_patterns = [
     path("", include("apps.scheduling.urls")),
     path("", include("apps.encounters.urls")),
     path("", include("apps.queues.urls")),
+    path("", include("apps.medical_records.urls")),
 ]
 
 urlpatterns = [

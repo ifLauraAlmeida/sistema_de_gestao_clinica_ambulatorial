@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "apps.scheduling",
     "apps.encounters",
     "apps.queues",
+    "apps.medical_records",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
