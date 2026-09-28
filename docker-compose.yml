@@ -41,5 +41,18 @@ services:
       redis:
         condition: service_healthy
 
+  frontend:
+    build:
+      context: ./frontend
+    env_file: .env
+    volumes:
+      - ./frontend:/app:z
+      # Mantém as dependências instaladas na imagem, sem sobrescrever pelo host.
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
