@@ -11,6 +11,7 @@ from apps.core.request_metadata import get_client_ip
 from apps.encounters.serializers import CheckInSerializer, EncounterSummarySerializer
 from apps.encounters.services.check_in import check_in_appointment
 from apps.encounters.services.complete_encounter import complete_encounter
+from apps.encounters.services.start_encounter import start_encounter
 
 
 class CheckInView(APIView):
@@ -40,6 +41,21 @@ class CompleteEncounterView(APIView):
         encounter = complete_encounter(
             encounter_id,
             completed_by=get_authenticated_user(request),
+            ip_address=get_client_ip(request),
+        )
+        return Response(EncounterSummarySerializer(encounter).data)
+
+
+class StartEncounterView(APIView):
+    """Marca o atendimento como EM_ATENDIMENTO (médico responsável)."""
+
+    permission_classes = (HasRequiredAccessPermission,)
+    required_permissions = {"POST": AccessPermission.ENCOUNTER_START_OWN}
+
+    def post(self, request: Request, encounter_id: uuid.UUID) -> Response:
+        encounter = start_encounter(
+            encounter_id,
+            started_by=get_authenticated_user(request),
             ip_address=get_client_ip(request),
         )
         return Response(EncounterSummarySerializer(encounter).data)
