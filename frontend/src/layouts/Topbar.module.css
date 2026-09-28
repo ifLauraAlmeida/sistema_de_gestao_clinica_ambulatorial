@@ -1,0 +1,57 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: var(--topbar-height);
+  padding: 0 var(--space-6);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--color-white);
+}
+
+.station {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--text-body);
+}
+
+.changeStation {
+  margin-left: var(--space-2);
+  color: var(--color-blue-600);
+  font-weight: 600;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-blue-100);
+  color: var(--color-pen-blue);
+  font-weight: 700;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.role {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
