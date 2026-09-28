@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sgca-backend"
+version = "0.1.0"
+description = "Backend do Sistema de Gestão Clínica Ambulatorial"
+requires-python = ">=3.12"
+dependencies = [
+    "Django>=6.1,<6.2",
+    "djangorestframework>=3.18,<3.19",
+    "channels>=4.3,<5",
+    "channels-redis>=4.3,<5",
+    "daphne>=4.2,<5",
+    "django-environ>=0.14,<0.15",
+    "psycopg[binary]>=3.3,<3.4",
+    "redis>=6,<9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9,<10",
+    "pytest-django>=4.14,<5",
+    "ruff>=0.16,<0.17",
+    "mypy>=1.18",
+    "django-stubs>=6.1,<6.2",
+    "djangorestframework-stubs>=3.18,<3.19",
+    "types-channels>=4.2",
+]
+
+# O backend é executado a partir do diretório do projeto (manage.py), e não como
+# pacote instalado. O pyproject existe para declarar dependências e ferramentas;
+# por isso nenhum pacote é distribuído.
+[tool.setuptools]
+packages = []
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["apps/*/migrations/*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "DJ", "SIM", "RUF", "ANN", "N", "RET"]
+ignore = ["ANN401", "RUF012"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["ANN"]
+"conftest.py" = ["ANN"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+exclude = ["apps/.*/migrations/", "apps/.*/tests/"]
+
+# django-environ não publica anotações de tipo.
+[[tool.mypy.overrides]]
+module = ["environ"]
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "config.settings.test"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+python_files = ["test_*.py"]
+pythonpath = ["."]
+addopts = "--strict-markers"
