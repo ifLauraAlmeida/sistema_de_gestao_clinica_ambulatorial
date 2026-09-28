@@ -1,6 +1,7 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { CalendarDays, CheckCircle2, Trash2, UserX, X } from 'lucide-react';
 import { Badge } from '../../components/ui/Badge';
+import { PhoneLink } from '../../components/ui/PhoneLink';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import type { Appointment, ManualAppointmentStatus } from '../../types/agenda';
@@ -38,7 +39,8 @@ export function AppointmentDetails({
   onClose,
 }: AppointmentDetailsProps): ReactElement {
   const scheduledFor = new Date(appointment.scheduled_for);
-  const rows: [string, string][] = [
+  const rows: [string, ReactNode][] = [
+    ['Telefone', <PhoneLink key="phone" phone={appointment.patient_phone} />],
     [
       'Data e horário',
       `${formatLongDate(scheduledFor)} às ${formatTime(appointment.scheduled_for)}`,

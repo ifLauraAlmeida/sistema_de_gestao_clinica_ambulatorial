@@ -8,6 +8,8 @@ export interface Appointment {
   id: string;
   patient: string;
   patient_name: string;
+  /** Contato para confirmar a consulta ou avisar o paciente. */
+  patient_phone: string;
   professional: string;
   professional_name: string;
   specialty: string;

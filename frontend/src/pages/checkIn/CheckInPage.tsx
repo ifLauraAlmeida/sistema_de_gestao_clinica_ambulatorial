@@ -6,6 +6,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { PhoneLink } from '../../components/ui/PhoneLink';
 import { Loading } from '../../components/ui/Loading';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Table } from '../../components/ui/Table';
@@ -99,6 +100,11 @@ export function CheckInPage(): ReactElement {
             columns={[
               { key: 'time', header: 'Horário', render: (a) => formatTime(a.scheduled_for) },
               { key: 'patient', header: 'Paciente', render: (a) => a.patient_name },
+              {
+                key: 'phone',
+                header: 'Telefone',
+                render: (a) => <PhoneLink phone={a.patient_phone} />,
+              },
               { key: 'specialty', header: 'Especialidade', render: (a) => a.specialty_name },
               { key: 'professional', header: 'Profissional', render: (a) => a.professional_name },
               {

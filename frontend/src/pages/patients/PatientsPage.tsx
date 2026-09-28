@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Loading } from '../../components/ui/Loading';
+import { PhoneLink } from '../../components/ui/PhoneLink';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Table } from '../../components/ui/Table';
 import { TextField } from '../../components/ui/TextField';
@@ -114,7 +115,11 @@ export function PatientsPage(): ReactElement {
                     render: (p) => p.social_name || p.full_name,
                   },
                   { key: 'cpf', header: 'CPF', render: (p) => p.cpf_masked || '—' },
-                  { key: 'phone', header: 'Telefone', render: (p) => p.phone || '—' },
+                  {
+                    key: 'phone',
+                    header: 'Telefone',
+                    render: (p) => <PhoneLink phone={p.phone} />,
+                  },
                   {
                     key: 'birth',
                     header: 'Data de nasc.',

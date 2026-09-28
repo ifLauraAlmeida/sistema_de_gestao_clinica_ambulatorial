@@ -86,6 +86,10 @@ describe('páginas da recepção', () => {
     await userEvent.click(
       await screen.findByRole('button', { name: 'Ver detalhes de Paciente Fictício Alfa' }),
     );
+    expect(screen.getByRole('link', { name: 'Ligar para (00) 90000-0001' })).toHaveAttribute(
+      'href',
+      'tel:00900000001',
+    );
     await userEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
 
     await waitFor(() =>

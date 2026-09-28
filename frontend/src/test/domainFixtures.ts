@@ -30,6 +30,7 @@ export function buildAppointment(overrides: Partial<Appointment> = {}): Appointm
     id: 'appointment-1',
     patient: 'patient-1',
     patient_name: 'Paciente Fictício Alfa',
+    patient_phone: '(00) 90000-0001',
     professional: 'professional-1',
     professional_name: 'Profissional Fictício',
     specialty: 'specialty-1',
