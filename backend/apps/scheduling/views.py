@@ -12,7 +12,7 @@ from apps.accounts.api_permissions import HasRequiredAccessPermission
 from apps.accounts.request_user import get_authenticated_user
 from apps.core.request_metadata import get_client_ip
 from apps.scheduling.models import Appointment
-from apps.scheduling.selectors import list_appointments_for_day
+from apps.scheduling.selectors import AgendaFilters, list_agenda
 from apps.scheduling.serializers import (
     AppointmentSerializer,
     CreateAppointmentSerializer,
@@ -21,8 +21,11 @@ from apps.scheduling.serializers import (
 from apps.scheduling.services import create_appointment, update_appointment
 
 
-class AppointmentDayQuerySerializer(serializers.Serializer[None]):
+class AgendaQuerySerializer(serializers.Serializer[None]):
     date = serializers.DateField(required=False)
+    professional = serializers.UUIDField(required=False)
+    specialty = serializers.UUIDField(required=False)
+    search = serializers.CharField(required=False, allow_blank=True, max_length=100)
 
 
 class AppointmentCollectionView(APIView):
@@ -35,10 +38,16 @@ class AppointmentCollectionView(APIView):
     }
 
     def get(self, request: Request) -> Response:
-        query = AppointmentDayQuerySerializer(data=request.query_params)
+        query = AgendaQuerySerializer(data=request.query_params)
         query.is_valid(raise_exception=True)
-        day = query.validated_data.get("date") or timezone.localdate()
-        return Response(AppointmentSerializer(list_appointments_for_day(day), many=True).data)
+        params = query.validated_data
+        filters = AgendaFilters(
+            day=params.get("date") or timezone.localdate(),
+            professional_id=params.get("professional"),
+            specialty_id=params.get("specialty"),
+            patient_search=params.get("search", ""),
+        )
+        return Response(AppointmentSerializer(list_agenda(filters), many=True).data)
 
     def post(self, request: Request) -> Response:
         serializer = CreateAppointmentSerializer(data=request.data)

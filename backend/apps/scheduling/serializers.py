@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
 from apps.patients.models import Patient
@@ -14,6 +15,7 @@ class AppointmentSerializer(serializers.ModelSerializer[Appointment]):
     )
     specialty_name = serializers.CharField(source="specialty.name", read_only=True)
     status_label = serializers.CharField(source="get_status_display", read_only=True)
+    ticket_code = serializers.SerializerMethodField()
 
     class Meta:
         model = Appointment
@@ -29,8 +31,16 @@ class AppointmentSerializer(serializers.ModelSerializer[Appointment]):
             "status",
             "status_label",
             "notes",
+            "ticket_code",
         )
         read_only_fields = fields
+
+    def get_ticket_code(self, appointment: Appointment) -> str | None:
+        """Senha gerada no check-in; nula enquanto o paciente não chegou."""
+        try:
+            return str(appointment.encounter.ticket_code)
+        except ObjectDoesNotExist:
+            return None
 
 
 class CreateAppointmentSerializer(serializers.Serializer[None]):

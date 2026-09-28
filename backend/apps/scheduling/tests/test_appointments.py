@@ -102,3 +102,31 @@ def test_invalid_date_filter_is_rejected(client_for, atendente):
 
     assert response.status_code == 400
     assert Appointment.objects.count() == 0
+
+
+def test_agenda_filters_by_professional_specialty_and_patient(
+    client_for, atendente, outro_medico, agenda_context
+):
+    create_appointment(**agenda_context, created_by=atendente)
+    orto = create_specialty("Ortopedia", "ORTO")
+    other = create_professional(outro_medico, orto)
+    create_appointment(create_patient("Outro Paciente"), other, orto, created_by=atendente)
+    client = client_for(atendente)
+
+    by_professional = client.get(URL, {"professional": str(other.id)}).json()
+    by_specialty = client.get(URL, {"specialty": str(agenda_context["specialty"].id)}).json()
+    by_patient = client.get(URL, {"search": "outro pac"}).json()
+
+    assert [a["patient_name"] for a in by_professional] == ["Outro Paciente"]
+    assert [a["patient_name"] for a in by_specialty] == ["Paciente Fictício"]
+    assert [a["patient_name"] for a in by_patient] == ["Outro Paciente"]
+
+
+def test_agenda_shows_ticket_after_check_in(client_for, atendente, agenda_context):
+    appointment = create_appointment(**agenda_context, created_by=atendente)
+    client = client_for(atendente)
+    assert client.get(URL).json()[0]["ticket_code"] is None
+
+    client.post("/api/v1/check-ins/", {"appointment_id": str(appointment.id)}, format="json")
+
+    assert client.get(URL).json()[0]["ticket_code"] == "GINE01"
