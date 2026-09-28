@@ -118,3 +118,21 @@ def test_logout_without_csrf_token_is_rejected(gestor):
     _login(client, token, "diego.gestor")
 
     assert client.post("/api/v1/auth/logout/").status_code == 403
+
+
+@pytest.mark.django_db
+def test_login_and_logout_close_open_work_session(atendente):
+    from apps.workstations.models import WorkSession
+    from apps.workstations.services import start_work_session
+    from apps.workstations.tests.factories import create_reception_desk
+
+    stale = start_work_session(atendente, create_reception_desk().id)
+    client, token = _csrf_client()
+
+    _login(client, token, "ana.recepcao")
+    stale.refresh_from_db()
+    assert stale.ended_at is not None
+
+    start_work_session(atendente, create_reception_desk("Guichê 09").id)
+    client.post("/api/v1/auth/logout/", HTTP_X_CSRFTOKEN=client.cookies["csrftoken"].value)
+    assert not WorkSession.objects.filter(user=atendente, ended_at__isnull=True).exists()
