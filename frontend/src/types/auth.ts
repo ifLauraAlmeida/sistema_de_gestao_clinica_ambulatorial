@@ -19,6 +19,7 @@ export type AccessPermission =
   | 'clinical_queue.call_own'
   | 'clinical_queue.view_all'
   | 'clinical_queue.call_any'
+  | 'encounter.start_own'
   | 'encounter.complete_own'
   | 'medical_record.view_active_patient'
   | 'medical_record.update_active_patient'

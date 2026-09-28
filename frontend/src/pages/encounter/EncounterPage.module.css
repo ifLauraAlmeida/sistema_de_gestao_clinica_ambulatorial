@@ -1,0 +1,127 @@
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-blue-700);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.patientHeader {
+  display: grid;
+  grid-template-columns: minmax(260px, 2fr) repeat(3, minmax(160px, 1fr));
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+}
+
+.patientIdentity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--color-blue-100);
+  color: var(--color-blue-600);
+}
+
+.patientName {
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-xl);
+}
+
+.fact {
+  display: flex;
+  gap: var(--space-3);
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--border-subtle);
+}
+
+.fact > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.factIcon {
+  color: var(--color-pen-blue);
+}
+
+.factLabel {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.factValue {
+  color: var(--text-strong);
+}
+
+.notes,
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.note,
+.timelineItem {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-gray-25);
+}
+
+.timelineHeader {
+  display: flex;
+  gap: var(--space-3);
+  color: var(--text-strong);
+}
+
+.noteMeta {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.noteContent {
+  margin: var(--space-2) 0 0;
+  white-space: pre-wrap;
+  color: var(--text-body);
+}
+
+.noteForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.noteActions,
+.actionsRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.confirmBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 480px;
+}
+
+@media (max-width: 1100px) {
+  .patientHeader {
+    grid-template-columns: 1fr 1fr;
+  }
+}
