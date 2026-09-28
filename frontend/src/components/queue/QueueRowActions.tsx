@@ -1,7 +1,9 @@
 import type { ReactElement } from 'react';
-import { ArrowRightCircle, CheckCircle2, Megaphone, RotateCcw } from 'lucide-react';
+import { ArrowRightCircle, CheckCircle2, Megaphone, PlayCircle, RotateCcw } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { EncounterRecordLink } from './EncounterRecordLink';
 import type { QueueEntry } from '../../types/queue';
+import { canCompleteEncounter, canStartEncounter } from '../../utils/queueMetrics';
 import styles from './Queue.module.css';
 
 interface QueueRowActionsProps {
@@ -11,12 +13,15 @@ interface QueueRowActionsProps {
   hasDestination: boolean;
   onCall: (entry: QueueEntry) => void;
   onForward?: (entry: QueueEntry) => void;
+  onStart?: (entry: QueueEntry) => void;
   onComplete?: (entry: QueueEntry) => void;
+  /** Exibe o acesso à tela de atendimento/prontuário. */
+  showRecordLink?: boolean;
 }
 
 /**
  * Ações de uma senha na fila. Exibir ou ocultar botões é apenas conveniência:
- * o backend valida perfil, dono da fila e posto em cada chamada.
+ * o backend valida perfil, dono da fila, posto e status em cada operação.
  */
 export function QueueRowActions({
   entry,
@@ -25,13 +30,15 @@ export function QueueRowActions({
   hasDestination,
   onCall,
   onForward,
+  onStart,
   onComplete,
+  showRecordLink = false,
 }: QueueRowActionsProps): ReactElement {
   const isRecall = entry.status === 'CALLED';
 
   return (
     <div className={styles.rowActions}>
-      {canCall && (
+      {canCall && entry.encounter_status !== 'EM_ATENDIMENTO' && (
         <Button
           variant="secondary"
           icon={isRecall ? <RotateCcw size={16} /> : <Megaphone size={16} />}
@@ -53,14 +60,25 @@ export function QueueRowActions({
           Encaminhar
         </Button>
       )}
-      {onComplete && entry.encounter_status === 'CHAMADO' && (
+      {onStart && canStartEncounter(entry) && (
+        <Button
+          variant="secondary"
+          icon={<PlayCircle size={16} />}
+          isLoading={busyKey === `start-${entry.id}`}
+          onClick={() => onStart(entry)}
+        >
+          Iniciar atendimento
+        </Button>
+      )}
+      {showRecordLink && <EncounterRecordLink encounterId={entry.encounter_id} />}
+      {onComplete && canCompleteEncounter(entry) && (
         <Button
           variant="primary"
           icon={<CheckCircle2 size={16} />}
           isLoading={busyKey === `complete-${entry.id}`}
           onClick={() => onComplete(entry)}
         >
-          Finalizar atendimento
+          Finalizar
         </Button>
       )}
     </div>

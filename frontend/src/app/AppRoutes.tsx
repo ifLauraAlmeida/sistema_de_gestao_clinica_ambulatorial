@@ -3,7 +3,9 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { MainLayout } from '../layouts/MainLayout';
 import { AgendaPage } from '../pages/agenda/AgendaPage';
 import { CheckInPage } from '../pages/checkIn/CheckInPage';
+import { ClinicalQueuePage } from '../pages/clinicalQueue/ClinicalQueuePage';
 import { DashboardPage } from '../pages/dashboard/DashboardPage';
+import { EncounterPage } from '../pages/encounter/EncounterPage';
 import { PatientsPage } from '../pages/patients/PatientsPage';
 import { ReceptionQueuePage } from '../pages/receptionQueue/ReceptionQueuePage';
 import { LoginPage } from '../pages/login/LoginPage';
@@ -24,10 +26,10 @@ const MODULE_PAGES: Record<string, ReactElement> = {
   '/agenda': <AgendaPage />,
   '/check-in': <CheckInPage />,
   '/fila-recepcao': <ReceptionQueuePage />,
+  '/fila-clinica': <ClinicalQueuePage />,
 };
 
 const PLACEHOLDER_DESCRIPTIONS: Record<string, string> = {
-  '/fila-clinica': 'Fila clínica e prontuário do atendimento.',
   '/auditoria': 'Consulta dos eventos de auditoria.',
 };
 
@@ -63,6 +65,15 @@ export function AppRoutes(): ReactElement {
                 <Route path={item.path} element={moduleElementFor(item)} />
               </Route>
             ))}
+            <Route
+              element={
+                <RequirePermission
+                  anyOf={['medical_record.view_active_patient', 'medical_record.view_any']}
+                />
+              }
+            >
+              <Route path="/atendimento/:encounterId" element={<EncounterPage />} />
+            </Route>
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Route>

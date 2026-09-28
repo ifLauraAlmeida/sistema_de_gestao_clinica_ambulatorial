@@ -104,7 +104,9 @@ describe('proteção de rotas e fluxo por perfil', () => {
     backendFor(user).install();
     renderApp('/dashboard');
 
-    expect(await screen.findByText('Minha fila ativa', { selector: 'h2' })).toBeInTheDocument();
+    expect(
+      await screen.findByText('Próximos da minha fila', { selector: 'h2' }),
+    ).toBeInTheDocument();
     expect(screen.queryByText('Fila da recepção', { selector: 'h2' })).toBeNull();
   });
 

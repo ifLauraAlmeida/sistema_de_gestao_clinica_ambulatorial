@@ -57,3 +57,13 @@ export function resolveSelectedEntry(
 ): QueueEntry | undefined {
   return entries.find((entry) => entry.id === selectedId) ?? nextWaitingEntry(entries);
 }
+
+/** Paciente chamado pode ter o atendimento iniciado (o backend também valida). */
+export function canStartEncounter(entry: QueueEntry): boolean {
+  return entry.encounter_status === 'CHAMADO';
+}
+
+/** Atendimento chamado ou em andamento pode ser finalizado (o backend também valida). */
+export function canCompleteEncounter(entry: QueueEntry): boolean {
+  return entry.encounter_status === 'CHAMADO' || entry.encounter_status === 'EM_ATENDIMENTO';
+}

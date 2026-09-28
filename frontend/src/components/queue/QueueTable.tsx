@@ -54,7 +54,7 @@ export function QueueTable({
     {
       key: 'status',
       header: 'Status',
-      render: (entry) => <Badge tone={STATUS_TONES[entry.status]}>{statusLabelOf(entry)}</Badge>,
+      render: (entry) => <Badge tone={statusToneOf(entry)}>{statusLabelOf(entry)}</Badge>,
     },
     ...(showWaitingTime ? [waitingColumn(now)] : []),
     {
@@ -76,9 +76,18 @@ export function QueueTable({
   );
 }
 
-/** Situação na fila; senhas finalizadas mostram o desfecho do atendimento (ex.: Atendido). */
+/**
+ * Situação exibida: a etapa do atendimento quando ela é mais informativa que a
+ * situação na fila (em atendimento ou finalizado); senão aguardando/chamado.
+ */
 function statusLabelOf(entry: QueueEntry): string {
-  return entry.status === 'FINISHED' ? entry.encounter_status_label : entry.status_label;
+  const showsEncounterStage =
+    entry.status === 'FINISHED' || entry.encounter_status === 'EM_ATENDIMENTO';
+  return showsEncounterStage ? entry.encounter_status_label : entry.status_label;
+}
+
+function statusToneOf(entry: QueueEntry): BadgeTone {
+  return entry.encounter_status === 'EM_ATENDIMENTO' ? 'success' : STATUS_TONES[entry.status];
 }
 
 function waitingColumn(now: Date): TableColumn<QueueEntry> {

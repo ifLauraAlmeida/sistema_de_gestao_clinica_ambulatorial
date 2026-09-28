@@ -19,8 +19,10 @@ const ROLE_PERMISSIONS: Record<UserRole, AccessPermission[]> = {
     'clinical_queue.view_own',
     'clinical_queue.view_inactive_own',
     'clinical_queue.call_own',
+    'encounter.start_own',
     'encounter.complete_own',
     'medical_record.view_active_patient',
+    'medical_record.update_active_patient',
     'work_session.consultation_room',
   ],
   GESTOR: [
@@ -28,6 +30,7 @@ const ROLE_PERMISSIONS: Record<UserRole, AccessPermission[]> = {
     'appointment.view',
     'reception_queue.view',
     'clinical_queue.view_all',
+    'medical_record.view_any',
     'audit.view',
     'work_session.reception_desk',
     'work_session.consultation_room',
