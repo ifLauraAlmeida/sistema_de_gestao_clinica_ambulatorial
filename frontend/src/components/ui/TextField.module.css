@@ -12,6 +12,7 @@
 
 .control {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: var(--space-2);
   min-height: 48px;
@@ -62,4 +63,9 @@
   margin: 0;
   font-size: var(--font-size-xs);
   color: var(--color-red-600);
+}
+
+/* O contorno de foco já é aplicado ao contêiner (.control:focus-within). */
+.input:focus-visible {
+  box-shadow: none;
 }

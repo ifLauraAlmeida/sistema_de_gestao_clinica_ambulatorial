@@ -83,3 +83,21 @@ export const apiClient = {
   post: <T>(path: string, body?: unknown): Promise<T> => request<T>('POST', path, body),
   patch: <T>(path: string, body?: unknown): Promise<T> => request<T>('PATCH', path, body),
 };
+
+/**
+ * Anexa parâmetros de consulta ao caminho, ignorando valores vazios.
+ *
+ * Exemplo:
+ *   withQuery('/appointments/', { date: '2026-09-28', search: '' }) // '/appointments/?date=2026-09-28'
+ */
+export function withQuery(
+  path: string,
+  params: Record<string, string | number | undefined>,
+): string {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== '') query.set(key, String(value));
+  }
+  const text = query.toString();
+  return text ? `${path}?${text}` : path;
+}
