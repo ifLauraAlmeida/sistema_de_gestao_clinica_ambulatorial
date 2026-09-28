@@ -21,9 +21,11 @@ O escopo funcional completo está em [`references/escopo_sistema.md`](references
 - acesso contextual ao prontuário (somente enquanto o paciente está na fila ativa do médico);
 - auditoria imutável (inclusive de tentativas negadas);
 - login, layout principal e dashboard por perfil;
+- telas da recepção: resumo do dia, pacientes, agenda, check-in e fila da recepção;
+- chamada com escolha da senha (recepção e médico), não apenas da próxima;
 - testes automatizados (incluindo os 30 cenários de autorização), lint e Docker.
 
-**Ainda não implementado** (próximas etapas): telas de pacientes/agenda/check-in, prontuário completo, prescrição, documentos e assinatura, financeiro e convênios, painel público e eventos WebSocket, relatórios, integrações externas, multiunidade.
+**Ainda não implementado** (próximas etapas): tela de prontuário/atendimento, tela de auditoria, prontuário completo, prescrição, documentos e assinatura, financeiro e convênios, painel público e eventos WebSocket, relatórios, integrações externas, multiunidade.
 
 ---
 
@@ -302,7 +304,8 @@ Guichê e consultório **não** são atributos do usuário. Após o login, atend
 |---|---|---|
 | GET/POST | `/api/v1/patients/` | `patient.view_demographics` / `patient.create` |
 | GET/PATCH | `/api/v1/patients/{id}/` | `patient.view_demographics` / `patient.update_demographics` |
-| GET/POST | `/api/v1/appointments/` | `appointment.view` / `appointment.create` |
+| GET/POST | `/api/v1/appointments/?date=&professional=&specialty=&search=` | `appointment.view` / `appointment.create` |
+| GET | `/api/v1/professionals/` | `appointment.view` |
 | PATCH | `/api/v1/appointments/{id}/` | `appointment.update` |
 | POST | `/api/v1/check-ins/` | `checkin.create` |
 | GET | `/api/v1/reception-queue/`, `/api/v1/reception-queue/calls/` | `reception_queue.view` |
