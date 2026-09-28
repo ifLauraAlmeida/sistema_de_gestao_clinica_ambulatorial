@@ -23,9 +23,11 @@ O escopo funcional completo está em [`references/escopo_sistema.md`](references
 - login, layout principal e dashboard por perfil;
 - telas da recepção: resumo do dia, pacientes, agenda, check-in e fila da recepção;
 - chamada com escolha da senha (recepção e médico), não apenas da próxima;
+- fila clínica do médico (chamar, iniciar, abrir atendimento) e visão das filas pelo gestor;
+- tela de prontuário e atendimento: evolução, histórico clínico anterior e finalização (acesso revogado após ATENDIDO);
 - testes automatizados (incluindo os 30 cenários de autorização), lint e Docker.
 
-**Ainda não implementado** (próximas etapas): tela de prontuário/atendimento, tela de auditoria, prontuário completo, prescrição, documentos e assinatura, financeiro e convênios, painel público e eventos WebSocket, relatórios, integrações externas, multiunidade.
+**Ainda não implementado** (próximas etapas): tela de auditoria, prontuário completo, prescrição, documentos e assinatura, financeiro e convênios, painel público e eventos WebSocket, relatórios, integrações externas, multiunidade.
 
 ---
 
@@ -275,10 +277,10 @@ A autorização real acontece **sempre no backend**. O frontend recebe a lista d
 | Check-in, fila da recepção, chamar para guichê | sim | não | sim |
 | Fila clínica própria (ativa/inativa), chamar para consultório | não | sim (própria) | sim (todas) |
 | Prontuário e histórico clínico | não | somente fila ativa | sim (auditado) |
-| Registrar evolução, finalizar atendimento | não | sim (próprio atendimento) | não¹ |
+| Registrar evolução, iniciar e finalizar atendimento | não | sim (próprio atendimento) | não¹ |
 | Histórico financeiro, indicadores gerais, auditoria, usuários | não | não | sim |
 
-¹ Decisão: o gestor tem acesso administrativo total, mas atos clínicos (evolução e ATENDIDO) permanecem exclusivos do médico responsável.
+¹ Decisão: o gestor tem acesso administrativo total, mas atos clínicos (evolução, início e finalização do atendimento) permanecem exclusivos do médico responsável.
 
 ---
 
@@ -313,6 +315,7 @@ Guichê e consultório **não** são atributos do usuário. Após o login, atend
 | POST | `/api/v1/reception-queue/{id}/forward/` | `reception_queue.forward` |
 | GET | `/api/v1/clinical-queue/?status=active\|inactive` | própria fila ou todas (gestor) |
 | POST | `/api/v1/clinical-queue/{id}/call/` | própria fila + consultório |
+| POST | `/api/v1/encounters/{id}/start/` | médico responsável (`encounter.start_own`) |
 | POST | `/api/v1/encounters/{id}/complete/` | médico responsável |
 | GET | `/api/v1/encounters/{id}/medical-record/`, `/clinical-history/` | política contextual |
 | POST | `/api/v1/encounters/{id}/clinical-notes/` | política contextual |
