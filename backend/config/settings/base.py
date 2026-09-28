@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "apps.encounters",
     "apps.queues",
     "apps.medical_records",
+    "apps.demo_data",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
