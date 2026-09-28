@@ -1,6 +1,8 @@
 from django.urls import path
 
 from apps.queues.views import (
+    ClinicalCallView,
+    ClinicalQueueView,
     ReceptionCallView,
     ReceptionForwardView,
     ReceptionQueueView,
@@ -23,5 +25,11 @@ urlpatterns = [
         "reception-queue/<uuid:entry_id>/forward/",
         ReceptionForwardView.as_view(),
         name="reception-queue-forward",
+    ),
+    path("clinical-queue/", ClinicalQueueView.as_view(), name="clinical-queue"),
+    path(
+        "clinical-queue/<uuid:entry_id>/call/",
+        ClinicalCallView.as_view(),
+        name="clinical-queue-call",
     ),
 ]
