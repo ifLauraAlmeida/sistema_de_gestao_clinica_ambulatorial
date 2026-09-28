@@ -1,12 +1,16 @@
 import type { ReactElement } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { MainLayout } from '../layouts/MainLayout';
+import { AgendaPage } from '../pages/agenda/AgendaPage';
+import { CheckInPage } from '../pages/checkIn/CheckInPage';
 import { DashboardPage } from '../pages/dashboard/DashboardPage';
+import { PatientsPage } from '../pages/patients/PatientsPage';
+import { ReceptionQueuePage } from '../pages/receptionQueue/ReceptionQueuePage';
 import { LoginPage } from '../pages/login/LoginPage';
 import { ModulePlaceholderPage } from '../pages/ModulePlaceholderPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { WorkstationPage } from '../pages/workstation/WorkstationPage';
-import { NAVIGATION_ITEMS } from './navigation';
+import { NAVIGATION_ITEMS, type NavigationItem } from './navigation';
 import {
   RedirectIfAuthenticated,
   RequireAuthentication,
@@ -14,14 +18,30 @@ import {
   RequireWorkstation,
 } from './routeGuards';
 
+/** Páginas já implementadas, por caminho do menu. */
+const MODULE_PAGES: Record<string, ReactElement> = {
+  '/pacientes': <PatientsPage />,
+  '/agenda': <AgendaPage />,
+  '/check-in': <CheckInPage />,
+  '/fila-recepcao': <ReceptionQueuePage />,
+};
+
 const PLACEHOLDER_DESCRIPTIONS: Record<string, string> = {
-  '/pacientes': 'Cadastro e busca de pacientes.',
-  '/agenda': 'Agendamento de consultas e acompanhamento.',
-  '/check-in': 'Registro de chegada e confirmação do paciente.',
-  '/fila-recepcao': 'Fila completa da recepção e chamadas.',
   '/fila-clinica': 'Fila clínica e prontuário do atendimento.',
   '/auditoria': 'Consulta dos eventos de auditoria.',
 };
+
+/** Página do módulo, ou tela reservada quando o módulo ainda não foi implementado. */
+function moduleElementFor(item: NavigationItem): ReactElement {
+  return (
+    MODULE_PAGES[item.path] ?? (
+      <ModulePlaceholderPage
+        title={item.label}
+        description={PLACEHOLDER_DESCRIPTIONS[item.path] ?? ''}
+      />
+    )
+  );
+}
 
 /**
  * Fluxo: não autenticado → login; atendente/médico sem posto → seleção de
@@ -38,21 +58,11 @@ export function AppRoutes(): ReactElement {
         <Route element={<RequireWorkstation />}>
           <Route element={<MainLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            {NAVIGATION_ITEMS.filter((item) => item.path in PLACEHOLDER_DESCRIPTIONS).map(
-              (item) => (
-                <Route key={item.path} element={<RequirePermission anyOf={item.anyOf} />}>
-                  <Route
-                    path={item.path}
-                    element={
-                      <ModulePlaceholderPage
-                        title={item.label}
-                        description={PLACEHOLDER_DESCRIPTIONS[item.path] ?? ''}
-                      />
-                    }
-                  />
-                </Route>
-              ),
-            )}
+            {NAVIGATION_ITEMS.filter((item) => item.path !== '/dashboard').map((item) => (
+              <Route key={item.path} element={<RequirePermission anyOf={item.anyOf} />}>
+                <Route path={item.path} element={moduleElementFor(item)} />
+              </Route>
+            ))}
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Route>

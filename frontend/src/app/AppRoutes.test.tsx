@@ -19,7 +19,8 @@ function backendFor(user: CurrentUser | null): FakeBackend {
     .on('GET', '/api/v1/reception-queue/', () => ({ status: 200, body: [] }))
     .on('GET', '/api/v1/reception-queue/calls/', () => ({ status: 200, body: [] }))
     .on('GET', '/api/v1/clinical-queue/?status=active', () => ({ status: 200, body: [] }))
-    .on('GET', '/api/v1/clinical-queue/?status=inactive', () => ({ status: 200, body: [] }));
+    .on('GET', '/api/v1/clinical-queue/?status=inactive', () => ({ status: 200, body: [] }))
+    .on('GET', '/api/v1/appointments/', () => ({ status: 200, body: [] }));
 }
 
 function station(name: string, type: Station['station_type']): Station {
@@ -51,7 +52,9 @@ describe('proteção de rotas e fluxo por perfil', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: /Guichê 04/ }));
 
-    expect(await screen.findByText('Fila da recepção', { selector: 'h2' })).toBeInTheDocument();
+    expect(
+      await screen.findByText('Fila de atendimento (agora)', { selector: 'h2' }),
+    ).toBeInTheDocument();
     expect(backend.requestsTo('POST', '/api/v1/work-sessions/')[0]?.body).toEqual({
       station_id: 'id-Guichê 04',
     });
@@ -87,7 +90,9 @@ describe('proteção de rotas e fluxo por perfil', () => {
     backendFor(user).install();
     renderApp('/dashboard');
 
-    expect(await screen.findByText('Fila da recepção', { selector: 'h2' })).toBeInTheDocument();
+    expect(
+      await screen.findByText('Fila de atendimento (agora)', { selector: 'h2' }),
+    ).toBeInTheDocument();
     expect(screen.queryByText('Minha fila ativa')).toBeNull();
     const menu = screen.getByRole('navigation', { name: 'Menu principal' });
     expect(within(menu).queryByRole('link', { name: 'Auditoria' })).toBeNull();

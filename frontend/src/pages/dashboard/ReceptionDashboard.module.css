@@ -1,0 +1,24 @@
+.shortcuts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+}
+
+.shortcut {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: 0 var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  color: var(--color-pen-blue);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.shortcut:hover {
+  border-color: var(--color-blue-500);
+  background: var(--color-blue-50);
+}

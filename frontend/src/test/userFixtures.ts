@@ -5,7 +5,10 @@ const ROLE_PERMISSIONS: Record<UserRole, AccessPermission[]> = {
   ATENDENTE: [
     'patient.create',
     'patient.view_demographics',
+    'patient.update_demographics',
     'appointment.view',
+    'appointment.create',
+    'appointment.update',
     'checkin.create',
     'reception_queue.view',
     'reception_queue.call',
