@@ -40,7 +40,7 @@ def seed_demo_data(password: str) -> None:
         users = {username: _ensure_user(username, password) for username, *_ in DEMO_USERS}
         _ensure_stations()
         professionals = [_ensure_professional(users[name]) for name in DEMO_DOCTOR_SPECIALTIES]
-        patients = [_ensure_patient(name, birth) for name, birth in DEMO_PATIENTS]
+        patients = [_ensure_patient(*record) for record in DEMO_PATIENTS]
         if not Appointment.objects.filter(scheduled_for__date=timezone.localdate()).exists():
             _create_todays_flow(patients, professionals, users["recepcao.demo"])
 
@@ -74,10 +74,13 @@ def _ensure_professional(user: User) -> Professional:
     return professional
 
 
-def _ensure_patient(full_name: str, birth_date: date) -> Patient:
+def _ensure_patient(full_name: str, birth_date: date, phone: str) -> Patient:
     patient, _ = Patient.objects.get_or_create(
         full_name=full_name, defaults={"birth_date": birth_date}
     )
+    if not patient.phone:
+        patient.phone = phone
+        patient.save(update_fields=["phone", "updated_at"])
     return patient
 
 
