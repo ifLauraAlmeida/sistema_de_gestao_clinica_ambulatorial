@@ -46,6 +46,7 @@ ignore = ["ANN401", "RUF012"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["ANN"]
+"tests/**" = ["ANN"]
 "conftest.py" = ["ANN"]
 
 [tool.ruff.format]
@@ -59,7 +60,7 @@ disallow_incomplete_defs = true
 warn_unused_ignores = true
 warn_redundant_casts = true
 no_implicit_optional = true
-exclude = ["apps/.*/migrations/", "apps/.*/tests/", "conftest.py"]
+exclude = ["apps/.*/migrations/", "apps/.*/tests/", "^tests/", "conftest.py"]
 
 # django-environ não publica anotações de tipo.
 [[tool.mypy.overrides]]
