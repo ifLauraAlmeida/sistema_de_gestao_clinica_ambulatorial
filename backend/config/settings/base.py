@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "apps.professionals",
     "apps.scheduling",
     "apps.encounters",
+    "apps.queues",
 ]
 
 AUTH_USER_MODEL = "accounts.User"

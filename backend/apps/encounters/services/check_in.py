@@ -11,6 +11,7 @@ from apps.audit.services import record_audit_event
 from apps.core.exceptions import ResourceNotFoundError, StateConflictError
 from apps.encounters.models import Encounter, EncounterStatus, EncounterStatusChange
 from apps.professionals.models import Specialty
+from apps.queues.services.enqueue import enqueue_in_reception
 from apps.scheduling.models import (
     CHECK_IN_ELIGIBLE_APPOINTMENT_STATUSES,
     Appointment,
@@ -22,7 +23,8 @@ def check_in_appointment(
     appointment_id: uuid.UUID, *, checked_in_by: User, ip_address: str | None = None
 ) -> Encounter:
     """
-    Registra a chegada, gera a senha do dia e cria o atendimento.
+    Registra a chegada, gera a senha do dia, cria o atendimento e o coloca na
+    fila da recepção.
 
     Exemplo:
         encounter = check_in_appointment(consulta.id, checked_in_by=atendente)
@@ -43,6 +45,7 @@ def check_in_appointment(
             new_status=EncounterStatus.CHECK_IN_REALIZADO,
             changed_by=checked_in_by,
         )
+        enqueue_in_reception(encounter)
         appointment.status = AppointmentStatus.CHECK_IN_REALIZADO
         appointment.save(update_fields=["status", "updated_at"])
         record_audit_event(
