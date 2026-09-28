@@ -1,9 +1,10 @@
 """Metadados de requisição usados em auditoria."""
 
 from django.http import HttpRequest
+from rest_framework.request import Request
 
 
-def get_client_ip(request: HttpRequest) -> str | None:
+def get_client_ip(request: HttpRequest | Request) -> str | None:
     """
     Retorna o IP do cliente conforme recebido pelo servidor.
 

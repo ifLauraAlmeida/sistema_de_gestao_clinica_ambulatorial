@@ -3,6 +3,7 @@
 from collections.abc import Mapping
 
 from django.http import HttpRequest
+from rest_framework.request import Request
 
 from apps.accounts.models import User
 from apps.audit.actions import AuditAction
@@ -48,7 +49,7 @@ def record_audit_event(
 
 
 def record_request_audit_event(
-    request: HttpRequest,
+    request: HttpRequest | Request,
     *,
     action: AuditAction,
     entity_type: str = "",
