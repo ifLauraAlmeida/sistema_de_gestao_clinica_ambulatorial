@@ -1,0 +1,67 @@
+.kpi {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}
+
+.label,
+.value,
+.caption {
+  margin: 0;
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.value {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-strong);
+}
+
+.caption {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.info .icon {
+  background: var(--color-blue-100);
+  color: var(--color-blue-600);
+}
+
+.success .icon {
+  background: var(--color-green-50);
+  color: var(--color-green-600);
+}
+
+.danger {
+  background: var(--color-red-50);
+}
+
+.danger .icon {
+  background: var(--color-white);
+  color: var(--color-red-600);
+}
+
+.danger .value {
+  color: var(--color-red-600);
+}

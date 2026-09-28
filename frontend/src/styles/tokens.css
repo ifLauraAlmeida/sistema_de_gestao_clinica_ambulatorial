@@ -1,0 +1,67 @@
+/*
+ * Design tokens extraídos das referências visuais (references/inspiracao_design):
+ * branco, cinzas claros, azul caneta e variações claras de azul. Vermelho é
+ * reservado para alertas (espera longa, erros, negações).
+ */
+:root {
+  --color-white: #ffffff;
+  --color-gray-25: #f7f9fc;
+  --color-gray-50: #f1f5fa;
+  --color-gray-100: #e9eef5;
+  --color-gray-200: #dbe3ee;
+  --color-gray-300: #c3cedd;
+  --color-gray-500: #64748b;
+  --color-gray-600: #4b5b72;
+  --color-gray-700: #334155;
+
+  --color-ink: #0f2a5c;
+  --color-pen-blue: #1b3a78;
+  --color-pen-blue-dark: #142c5e;
+  --color-blue-50: #edf4fe;
+  --color-blue-100: #dbe8fc;
+  --color-blue-200: #bcd4f8;
+  --color-blue-500: #2f7de1;
+  --color-blue-600: #1f67d2;
+  --color-blue-700: #1854ad;
+
+  --color-red-50: #fdeeee;
+  --color-red-600: #d23030;
+  --color-green-50: #e9f7ef;
+  --color-green-600: #1e8e4e;
+  --color-amber-50: #fff6e6;
+  --color-amber-600: #c26a05;
+
+  --surface-page: var(--color-gray-50);
+  --surface-card: var(--color-white);
+  --border-subtle: var(--color-gray-200);
+  --text-strong: var(--color-ink);
+  --text-body: var(--color-gray-700);
+  --text-muted: var(--color-gray-500);
+  --focus-ring: 0 0 0 3px rgb(47 125 225 / 35%);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 2px rgb(15 42 92 / 6%);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  --font-family:
+    'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+
+  --sidebar-width: 248px;
+  --topbar-height: 72px;
+}

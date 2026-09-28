@@ -1,0 +1,23 @@
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.error {
+  background: var(--color-red-50);
+  color: var(--color-red-600);
+}
+
+.success {
+  background: var(--color-green-50);
+  color: var(--color-green-600);
+}
+
+.info {
+  background: var(--color-blue-50);
+  color: var(--color-blue-700);
+}

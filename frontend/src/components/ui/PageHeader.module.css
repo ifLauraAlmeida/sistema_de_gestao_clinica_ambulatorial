@@ -1,0 +1,23 @@
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-lg);
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-3);
+}
