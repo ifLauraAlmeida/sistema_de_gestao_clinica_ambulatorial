@@ -16,7 +16,7 @@ URL = "/api/v1/appointments/"
 def agenda_context(medico, atendente):
     gine = create_specialty()
     return {
-        "patient": create_patient(),
+        "patient": create_patient(phone="(00) 90000-0000"),
         "professional": create_professional(medico, gine),
         "specialty": gine,
     }
@@ -60,6 +60,7 @@ def test_atendente_views_day_agenda(client_for, atendente, agenda_context):
     assert response.status_code == 200
     assert len(response.json()) == 1
     assert response.json()[0]["patient_name"] == "Paciente Fictício"
+    assert response.json()[0]["patient_phone"] == "(00) 90000-0000"
 
 
 def test_atendente_confirms_appointment_and_status_change_is_audited(

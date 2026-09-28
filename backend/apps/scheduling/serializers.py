@@ -10,6 +10,8 @@ class AppointmentSerializer(serializers.ModelSerializer[Appointment]):
     """Agendamento exibido na agenda (somente dados administrativos)."""
 
     patient_name = serializers.CharField(source="patient.display_name", read_only=True)
+    # Contato para a recepção confirmar a consulta ou avisar o paciente.
+    patient_phone = serializers.CharField(source="patient.phone", read_only=True)
     professional_name = serializers.CharField(
         source="professional.user.display_name", read_only=True
     )
@@ -23,6 +25,7 @@ class AppointmentSerializer(serializers.ModelSerializer[Appointment]):
             "id",
             "patient",
             "patient_name",
+            "patient_phone",
             "professional",
             "professional_name",
             "specialty",
