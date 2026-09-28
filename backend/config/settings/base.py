@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "channels",
     "apps.core",
     "apps.accounts",
+    "apps.audit",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
