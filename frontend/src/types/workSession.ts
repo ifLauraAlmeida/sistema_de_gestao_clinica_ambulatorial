@@ -1,4 +1,4 @@
-export type StationType = 'RECEPTION_DESK' | 'CONSULTATION_ROOM';
+export type StationType = 'RECEPTION_DESK' | 'CONSULTATION_ROOM' | 'EXAM_ROOM';
 
 export interface Station {
   id: string;

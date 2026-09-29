@@ -15,6 +15,7 @@ import styles from './WorkstationPage.module.css';
 const INSTRUCTIONS: Record<StationType | 'ANY', string> = {
   RECEPTION_DESK: 'Informe em qual guichê você está atendendo antes de chamar pacientes.',
   CONSULTATION_ROOM: 'Informe em qual consultório você está atendendo antes de chamar pacientes.',
+  EXAM_ROOM: 'Informe em qual sala de exames você está atuando antes de chamar pacientes.',
   ANY: 'Selecione um posto apenas se for realizar chamadas.',
 };
 

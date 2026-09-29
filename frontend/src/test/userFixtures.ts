@@ -9,6 +9,7 @@ const ROLE_PERMISSIONS: Record<UserRole, AccessPermission[]> = {
     'appointment.view',
     'appointment.create',
     'appointment.update',
+    'catalog.view',
     'checkin.create',
     'reception_queue.view',
     'reception_queue.call',
@@ -23,7 +24,28 @@ const ROLE_PERMISSIONS: Record<UserRole, AccessPermission[]> = {
     'encounter.complete_own',
     'medical_record.view_active_patient',
     'medical_record.update_active_patient',
+    'procedure_record.update_own',
     'work_session.consultation_room',
+  ],
+  PROFISSIONAL_SAUDE: [
+    'clinical_queue.view_own',
+    'clinical_queue.view_inactive_own',
+    'clinical_queue.call_own',
+    'encounter.start_own',
+    'encounter.complete_own',
+    'medical_record.view_active_patient',
+    'medical_record.update_active_patient',
+    'procedure_record.update_own',
+    'work_session.consultation_room',
+  ],
+  TECNICO: [
+    'clinical_queue.view_own',
+    'clinical_queue.view_inactive_own',
+    'clinical_queue.call_own',
+    'encounter.start_own',
+    'encounter.complete_own',
+    'procedure_record.update_own',
+    'work_session.exam_room',
   ],
   GESTOR: [
     'patient.view_demographics',
@@ -31,6 +53,8 @@ const ROLE_PERMISSIONS: Record<UserRole, AccessPermission[]> = {
     'reception_queue.view',
     'clinical_queue.view_all',
     'medical_record.view_any',
+    'procedure_record.view_any',
+    'catalog.view',
     'audit.view',
     'work_session.reception_desk',
     'work_session.consultation_room',
@@ -40,12 +64,16 @@ const ROLE_PERMISSIONS: Record<UserRole, AccessPermission[]> = {
 const REQUIRED_STATION: Record<UserRole, StationType | null> = {
   ATENDENTE: 'RECEPTION_DESK',
   MEDICO: 'CONSULTATION_ROOM',
+  PROFISSIONAL_SAUDE: 'CONSULTATION_ROOM',
+  TECNICO: 'EXAM_ROOM',
   GESTOR: null,
 };
 
 const ROLE_LABELS: Record<UserRole, string> = {
   ATENDENTE: 'Atendente',
   MEDICO: 'Médico',
+  PROFISSIONAL_SAUDE: 'Profissional de saúde',
+  TECNICO: 'Técnico de exames',
   GESTOR: 'Gestor',
 };
 

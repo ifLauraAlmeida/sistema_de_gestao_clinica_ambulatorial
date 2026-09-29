@@ -1,6 +1,6 @@
 import type { WorkSession, StationType } from './workSession';
 
-export type UserRole = 'ATENDENTE' | 'MEDICO' | 'GESTOR';
+export type UserRole = 'ATENDENTE' | 'MEDICO' | 'PROFISSIONAL_SAUDE' | 'TECNICO' | 'GESTOR';
 
 /** Permissões granulares definidas no backend (apps/accounts/access_permissions.py). */
 export type AccessPermission =
@@ -24,13 +24,17 @@ export type AccessPermission =
   | 'medical_record.view_active_patient'
   | 'medical_record.update_active_patient'
   | 'medical_record.view_any'
+  | 'procedure_record.update_own'
+  | 'procedure_record.view_any'
+  | 'catalog.view'
   | 'billing.view_history'
   | 'reports.view_own'
   | 'reports.view_all'
   | 'users.manage'
   | 'audit.view'
   | 'work_session.reception_desk'
-  | 'work_session.consultation_room';
+  | 'work_session.consultation_room'
+  | 'work_session.exam_room';
 
 /**
  * Usuário autenticado conforme `/api/v1/auth/me/`.
