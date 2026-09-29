@@ -23,6 +23,7 @@ from apps.queues.selectors import (
 from apps.queues.serializers import QueueCallSerializer, QueueEntrySerializer
 from apps.queues.services.call_ticket import call_queue_ticket
 from apps.queues.services.forward_to_clinical_queue import forward_to_clinical_queue
+from apps.queues.services.mark_no_show import mark_queue_entry_no_show
 
 
 class ReceptionQueueView(APIView):
@@ -138,3 +139,37 @@ class ClinicalCallView(APIView):
             ip_address=get_client_ip(request),
         )
         return Response(QueueCallSerializer(call).data, status=201)
+
+
+def _mark_no_show_response(
+    request: Request, entry_id: uuid.UUID, queue_type: QueueType
+) -> Response:
+    entry = mark_queue_entry_no_show(
+        entry_id,
+        queue_type,
+        marked_by=get_authenticated_user(request),
+        ip_address=get_client_ip(request),
+    )
+    return Response({"id": str(entry.pk), "status": entry.status})
+
+
+class ReceptionNoShowView(APIView):
+    """Registra não comparecimento de senha já chamada para o guichê. Irreversível."""
+
+    permission_classes = (HasRequiredAccessPermission,)
+    required_permissions = {"POST": AccessPermission.RECEPTION_QUEUE_CALL}
+
+    def post(self, request: Request, entry_id: uuid.UUID) -> Response:
+        return _mark_no_show_response(request, entry_id, QueueType.RECEPTION)
+
+
+class ClinicalNoShowView(APIView):
+    """Registra não comparecimento de senha já chamada para o consultório. Irreversível."""
+
+    permission_classes = (HasRequiredAccessPermission,)
+    required_permissions = {
+        "POST": (AccessPermission.CLINICAL_QUEUE_CALL_OWN, AccessPermission.CLINICAL_QUEUE_CALL_ANY)
+    }
+
+    def post(self, request: Request, entry_id: uuid.UUID) -> Response:
+        return _mark_no_show_response(request, entry_id, QueueType.CLINICAL)

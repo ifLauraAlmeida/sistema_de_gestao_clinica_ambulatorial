@@ -19,6 +19,7 @@ class QueueEntryStatus(models.TextChoices):
     CALLED = "CALLED", "Chamado"
     FINISHED = "FINISHED", "Finalizado"
     CANCELLED = "CANCELLED", "Cancelado"
+    NO_SHOW = "NO_SHOW", "Não compareceu"
 
 
 ACTIVE_QUEUE_ENTRY_STATUSES = (QueueEntryStatus.WAITING, QueueEntryStatus.CALLED)
