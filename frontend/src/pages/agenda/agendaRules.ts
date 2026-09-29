@@ -6,6 +6,9 @@ import type {
   ManualAppointmentStatus,
   Professional,
 } from '../../types/agenda';
+import type { CatalogService } from '../../types/catalog';
+
+export { serviceWithLaterality } from '../../utils/serviceLabels';
 
 export const APPOINTMENT_STATUS_TONES: Record<AppointmentStatus, BadgeTone> = {
   AGENDADO: 'info',
@@ -61,4 +64,26 @@ export function specialtyOptions(
   const unique = new Map<string, string>();
   source.flatMap((p) => p.specialties).forEach((s) => unique.set(s.id, s.name));
   return [...unique].map(([value, label]) => ({ value, label }));
+}
+
+export const LATERALITY_OPTIONS: SelectOption[] = [
+  { value: 'DIREITA', label: 'Direita' },
+  { value: 'ESQUERDA', label: 'Esquerda' },
+  { value: 'BILATERAL', label: 'Bilateral' },
+];
+
+/** Profissionais que atendem a especialidade do serviço (o backend também valida). */
+export function professionalsForService(
+  professionals: Professional[],
+  service: CatalogService | undefined,
+): Professional[] {
+  if (!service) return [];
+  return professionals.filter((professional) =>
+    professional.specialties.some((specialty) => specialty.id === service.specialty_id),
+  );
+}
+
+/** "Raios-X › Membro inferior › Raio-X de joelho (Exame, 15 min)" */
+export function describeService(service: CatalogService): string {
+  return `${service.category_name} › ${service.group_name} › ${service.name} (${service.service_type_label}, ${service.duration_minutes} min)`;
 }

@@ -146,4 +146,85 @@ describe('páginas da recepção', () => {
 
     expect(await screen.findByText('Senha GINE04 chamada para Guichê 02.')).toBeInTheDocument();
   });
+
+  it('agenda serviço exigindo lateralidade e filtra profissionais pela especialidade', async () => {
+    const service = {
+      id: 'svc-joelho',
+      name: 'Raio-X de joelho',
+      service_type: 'EXAME',
+      service_type_label: 'Exame',
+      duration_minutes: 15,
+      requires_laterality: true,
+      allows_sedation: false,
+      is_laboratory_collection: false,
+      preparation_instructions: '',
+      specialty_id: 'rx',
+      specialty_name: 'Radiologia',
+      group_name: 'Membro inferior',
+      category_name: 'Raios-X',
+      aliases: [],
+      has_execution_form: true,
+    };
+    const backend = receptionBackend()
+      .on('GET', '/api/v1/professionals/', () => ({
+        status: 200,
+        body: [
+          {
+            id: 'tec',
+            name: 'Rafael Radiologia',
+            specialties: [{ id: 'rx', name: 'Radiologia', ticket_prefix: 'RX' }],
+          },
+          {
+            id: 'orto',
+            name: 'Carlos Orto',
+            specialties: [{ id: 'o', name: 'Ortopedia', ticket_prefix: 'ORTO' }],
+          },
+        ],
+      }))
+      .on('GET', '/api/v1/patients/', () => ({
+        status: 200,
+        body: {
+          count: 1,
+          next: null,
+          previous: null,
+          results: [
+            {
+              id: 'p1',
+              full_name: 'Paciente Um',
+              social_name: '',
+              cpf_masked: '',
+              birth_date: '1990-01-01',
+              phone: '',
+              is_active: true,
+            },
+          ],
+        },
+      }))
+      .on('GET', '/api/v1/catalog/services/', () => ({ status: 200, body: [service] }))
+      .on('POST', '/api/v1/appointments/', () => ({
+        status: 201,
+        body: buildAppointment({ id: 'novo', patient_name: 'Paciente Um' }),
+      }));
+    backend.install();
+    renderApp('/agenda');
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Novo agendamento' }));
+    await userEvent.type(screen.getByLabelText('Localizar paciente'), 'um{Enter}');
+    await userEvent.type(screen.getByLabelText('Buscar serviço'), 'joelho{Enter}');
+    const professional = await screen.findByLabelText('Profissional *');
+    expect(within(professional).queryByText('Carlos Orto')).toBeNull();
+    await userEvent.selectOptions(screen.getByLabelText('Lateralidade *'), 'DIREITA');
+    await userEvent.type(screen.getByLabelText('Horário *'), '10:30');
+    await userEvent.click(screen.getByRole('button', { name: 'Agendar' }));
+
+    await waitFor(() =>
+      expect(backend.requestsTo('POST', '/api/v1/appointments/')[0]?.body).toMatchObject({
+        patient: 'p1',
+        professional: 'tec',
+        service: 'svc-joelho',
+        laterality: 'DIREITA',
+        laboratory_exams: [],
+      }),
+    );
+  });
 });

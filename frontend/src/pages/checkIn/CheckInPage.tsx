@@ -19,7 +19,7 @@ import type { Appointment, CheckInResult } from '../../types/agenda';
 import { formatTime, toIsoDate } from '../../utils/dateTime';
 import { describeError } from '../../utils/errorMessages';
 import grid from '../../layouts/PageGrid.module.css';
-import { APPOINTMENT_STATUS_TONES } from '../agenda/agendaRules';
+import { APPOINTMENT_STATUS_TONES, serviceWithLaterality } from '../agenda/agendaRules';
 import { canCheckIn } from './checkInRules';
 import { ReceptionTodayCard } from './ReceptionTodayCard';
 import styles from './CheckInPage.module.css';
@@ -73,7 +73,8 @@ export function CheckInPage(): ReactElement {
             <strong>Chegada registrada: {lastCheckIn.patient_name}</strong>
             <p>
               Senha <span className={styles.ticket}>{lastCheckIn.ticket_code}</span> gerada para{' '}
-              {lastCheckIn.specialty_name} e incluída na fila da recepção.
+              {lastCheckIn.service_name ?? lastCheckIn.specialty_name} e incluída na fila da
+              recepção.
             </p>
           </div>
         </div>
@@ -105,7 +106,14 @@ export function CheckInPage(): ReactElement {
                 header: 'Telefone',
                 render: (a) => <PhoneLink phone={a.patient_phone} />,
               },
-              { key: 'specialty', header: 'Especialidade', render: (a) => a.specialty_name },
+              {
+                key: 'service',
+                header: 'Serviço',
+                render: (a) =>
+                  a.service_name
+                    ? serviceWithLaterality(a.service_name, a.laterality_label)
+                    : a.specialty_name,
+              },
               { key: 'professional', header: 'Profissional', render: (a) => a.professional_name },
               {
                 key: 'status',

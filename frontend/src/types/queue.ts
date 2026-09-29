@@ -19,6 +19,9 @@ export interface QueueEntry {
   ticket_code: string;
   patient_name: string;
   specialty_name: string;
+  /** Serviço a realizar; nulo em atendimentos anteriores ao catálogo. */
+  service_name: string | null;
+  laterality_label: string;
   professional_name: string;
   status: QueueEntryStatus;
   status_label: string;

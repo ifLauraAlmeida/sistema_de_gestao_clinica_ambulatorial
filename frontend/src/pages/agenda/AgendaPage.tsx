@@ -18,7 +18,12 @@ import { formatTime, toIsoDate } from '../../utils/dateTime';
 import { describeError } from '../../utils/errorMessages';
 import { hasAnyPermission } from '../../utils/userAccess';
 import grid from '../../layouts/PageGrid.module.css';
-import { APPOINTMENT_STATUS_TONES, professionalOptions, specialtyOptions } from './agendaRules';
+import {
+  APPOINTMENT_STATUS_TONES,
+  professionalOptions,
+  serviceWithLaterality,
+  specialtyOptions,
+} from './agendaRules';
 import { AgendaSummaryCard } from './AgendaSummaryCard';
 import { AppointmentDetails } from './AppointmentDetails';
 import { NewAppointmentForm } from './NewAppointmentForm';
@@ -142,7 +147,14 @@ export function AgendaPage(): ReactElement {
                     </button>
                   ),
                 },
-                { key: 'specialty', header: 'Especialidade', render: (a) => a.specialty_name },
+                {
+                  key: 'service',
+                  header: 'Serviço',
+                  render: (a) =>
+                    a.service_name
+                      ? serviceWithLaterality(a.service_name, a.laterality_label)
+                      : a.specialty_name,
+                },
                 { key: 'professional', header: 'Profissional', render: (a) => a.professional_name },
                 {
                   key: 'status',

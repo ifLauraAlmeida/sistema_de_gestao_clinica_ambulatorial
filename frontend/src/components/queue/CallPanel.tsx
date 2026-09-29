@@ -52,7 +52,8 @@ export function CallPanel({
           <span className={styles.nextCode}>{selectedEntry.ticket_code}</span>
           <span className={styles.nextPatient}>{selectedEntry.patient_name}</span>
           <span className={styles.nextMeta}>
-            {selectedEntry.specialty_name} • {waitingMinutes(selectedEntry, now)} min de espera
+            {selectedEntry.service_name ?? selectedEntry.specialty_name} •{' '}
+            {waitingMinutes(selectedEntry, now)} min de espera
           </span>
         </div>
       ) : (

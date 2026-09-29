@@ -4,6 +4,7 @@ import { Badge, type BadgeTone } from '../ui/Badge';
 import { EmptyState } from '../ui/EmptyState';
 import { Table, type TableColumn } from '../ui/Table';
 import type { QueueEntry, QueueEntryStatus } from '../../types/queue';
+import { serviceWithLaterality } from '../../utils/serviceLabels';
 import { waitTone, waitingMinutes } from '../../utils/queueMetrics';
 import styles from './Queue.module.css';
 
@@ -42,7 +43,14 @@ export function QueueTable({
       render: (entry) => <span className={styles.ticket}>{entry.ticket_code}</span>,
     },
     { key: 'patient', header: 'Paciente', render: (entry) => entry.patient_name },
-    { key: 'specialty', header: 'Especialidade', render: (entry) => entry.specialty_name },
+    {
+      key: 'service',
+      header: 'Serviço',
+      render: (entry) =>
+        entry.service_name
+          ? serviceWithLaterality(entry.service_name, entry.laterality_label)
+          : entry.specialty_name,
+    },
     ...(showProfessional
       ? [
           {

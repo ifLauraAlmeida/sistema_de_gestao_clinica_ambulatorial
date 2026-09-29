@@ -31,6 +31,18 @@ interface AppointmentDetailsProps {
   onClose: () => void;
 }
 
+/** Linhas exibidas só quando o serviço tem a opção (lateralidade, sedação, exames, preparo). */
+function optionalRows(appointment: Appointment): [string, string][] {
+  const rows: [string, string][] = [];
+  if (appointment.laterality_label) rows.push(['Lateralidade', appointment.laterality_label]);
+  if (appointment.with_sedation) rows.push(['Sedação', 'Sim']);
+  if (appointment.laboratory_exam_names.length) {
+    rows.push(['Exames', appointment.laboratory_exam_names.join(', ')]);
+  }
+  if (appointment.preparation) rows.push(['Preparo', appointment.preparation]);
+  return rows;
+}
+
 export function AppointmentDetails({
   appointment,
   busyStatus,
@@ -45,7 +57,8 @@ export function AppointmentDetails({
       'Data e horário',
       `${formatLongDate(scheduledFor)} às ${formatTime(appointment.scheduled_for)}`,
     ],
-    ['Especialidade', appointment.specialty_name],
+    ['Serviço', appointment.service_name ?? appointment.specialty_name],
+    ...optionalRows(appointment),
     ['Profissional', appointment.professional_name],
     ['Senha', appointment.ticket_code ?? 'gerada no check-in'],
     ['Observações', appointment.notes || '—'],

@@ -1,0 +1,18 @@
+.field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--text-strong);
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-blue-600);
+}
+
+.hint {
+  color: var(--text-muted);
+}

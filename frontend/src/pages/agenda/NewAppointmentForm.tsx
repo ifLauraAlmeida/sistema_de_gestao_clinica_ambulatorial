@@ -3,16 +3,20 @@ import { CalendarPlus, Search, X } from 'lucide-react';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
+import { CheckboxField } from '../../components/ui/CheckboxField';
 import { SelectField } from '../../components/ui/SelectField';
 import { TextAreaField } from '../../components/ui/TextAreaField';
 import { TextField } from '../../components/ui/TextField';
 import { createAppointment } from '../../services/agenda';
 import { searchPatients } from '../../services/patients';
-import type { Appointment, Professional } from '../../types/agenda';
+import type { Appointment, Laterality, Professional } from '../../types/agenda';
+import type { CatalogService } from '../../types/catalog';
 import type { PatientListItem } from '../../types/patient';
 import { combineLocalDateTime } from '../../utils/dateTime';
 import { describeError, fieldErrorsOf } from '../../utils/errorMessages';
-import { professionalOptions, specialtyOptions } from './agendaRules';
+import { LATERALITY_OPTIONS, professionalOptions, professionalsForService } from './agendaRules';
+import { LaboratoryExamPicker } from './LaboratoryExamPicker';
+import { ServicePicker } from './ServicePicker';
 import styles from './AgendaPage.module.css';
 
 interface NewAppointmentFormProps {
@@ -22,7 +26,7 @@ interface NewAppointmentFormProps {
   onClose: () => void;
 }
 
-/** Agendamento de consulta: localizar paciente, escolher profissional, especialidade e horário. */
+/** Agendamento de um serviço do catálogo: paciente, serviço, opções, profissional e horário. */
 export function NewAppointmentForm({
   professionals,
   defaultDate,
@@ -32,14 +36,18 @@ export function NewAppointmentForm({
   const [patientSearch, setPatientSearch] = useState('');
   const [patients, setPatients] = useState<PatientListItem[] | null>(null);
   const [patientId, setPatientId] = useState('');
+  const [service, setService] = useState<CatalogService | undefined>();
   const [professionalId, setProfessionalId] = useState('');
-  const [specialtyId, setSpecialtyId] = useState('');
+  const [laterality, setLaterality] = useState<Laterality | ''>('');
+  const [withSedation, setWithSedation] = useState(false);
+  const [examIds, setExamIds] = useState<string[]>([]);
   const [date, setDate] = useState(defaultDate);
   const [time, setTime] = useState('');
   const [notes, setNotes] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSaving, setSaving] = useState(false);
+  const eligibleProfessionals = professionalsForService(professionals, service);
 
   async function findPatients(): Promise<void> {
     const page = await searchPatients(patientSearch.trim());
@@ -47,9 +55,12 @@ export function NewAppointmentForm({
     setPatientId(page.results[0]?.id ?? '');
   }
 
-  function selectProfessional(id: string): void {
-    setProfessionalId(id);
-    setSpecialtyId(specialtyOptions(professionals, id)[0]?.value ?? '');
+  function selectService(selected: CatalogService | undefined): void {
+    setService(selected);
+    setLaterality('');
+    setWithSedation(false);
+    setExamIds([]);
+    setProfessionalId(professionalsForService(professionals, selected)[0]?.id ?? '');
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -61,7 +72,10 @@ export function NewAppointmentForm({
       const appointment = await createAppointment({
         patient: patientId,
         professional: professionalId,
-        specialty: specialtyId,
+        service: service?.id ?? '',
+        laterality,
+        with_sedation: withSedation,
+        laboratory_exams: examIds,
         scheduled_for: date && time ? combineLocalDateTime(date, time) : '',
         notes,
       });
@@ -120,22 +134,45 @@ export function NewAppointmentForm({
             error={fieldErrors.patient}
           />
         )}
-        <SelectField
-          label="Profissional *"
-          value={professionalId}
-          placeholder="Selecione o profissional"
-          options={professionalOptions(professionals)}
-          onChange={(event) => selectProfessional(event.target.value)}
-          error={fieldErrors.professional}
-        />
-        <SelectField
-          label="Especialidade *"
-          value={specialtyId}
-          placeholder="Selecione a especialidade"
-          options={specialtyOptions(professionals, professionalId || undefined)}
-          onChange={(event) => setSpecialtyId(event.target.value)}
-          error={fieldErrors.specialty}
-        />
+        <ServicePicker selected={service} error={fieldErrors.service} onSelect={selectService} />
+        {service && (
+          <>
+            <SelectField
+              label="Profissional *"
+              value={professionalId}
+              placeholder={
+                eligibleProfessionals.length ? undefined : 'Nenhum profissional cadastrado'
+              }
+              options={professionalOptions(eligibleProfessionals)}
+              onChange={(event) => setProfessionalId(event.target.value)}
+              error={fieldErrors.professional}
+            />
+            {service.requires_laterality && (
+              <SelectField
+                label="Lateralidade *"
+                value={laterality}
+                placeholder="Selecione o lado"
+                options={LATERALITY_OPTIONS}
+                onChange={(event) => setLaterality(event.target.value as Laterality | '')}
+                error={fieldErrors.laterality}
+              />
+            )}
+            {service.allows_sedation && (
+              <CheckboxField
+                label="Com sedação"
+                checked={withSedation}
+                onChange={(event) => setWithSedation(event.target.checked)}
+              />
+            )}
+            {service.is_laboratory_collection && (
+              <LaboratoryExamPicker
+                selectedIds={examIds}
+                onChange={setExamIds}
+                error={fieldErrors.laboratory_exams}
+              />
+            )}
+          </>
+        )}
         <div className={styles.inline}>
           <TextField
             label="Data *"
@@ -160,8 +197,12 @@ export function NewAppointmentForm({
           <Button variant="secondary" onClick={onClose}>
             Cancelar
           </Button>
-          <Button type="submit" isLoading={isSaving} disabled={!patientId || !professionalId}>
-            Agendar consulta
+          <Button
+            type="submit"
+            isLoading={isSaving}
+            disabled={!patientId || !service || !professionalId}
+          >
+            Agendar
           </Button>
         </div>
       </form>

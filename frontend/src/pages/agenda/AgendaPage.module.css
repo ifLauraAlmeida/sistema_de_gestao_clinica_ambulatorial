@@ -57,6 +57,7 @@
 
 .inline > * {
   flex: 1;
+  min-width: 0;
 }
 
 .inline > button {
@@ -109,4 +110,44 @@
 
 .linkButton:hover {
   text-decoration: underline;
+}
+
+.preparation {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-amber-50);
+  color: var(--text-body);
+  font-size: var(--font-size-sm);
+}
+
+.examPicker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.examPicker legend {
+  padding: 0 var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.examList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.fieldError {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-red-600);
 }
