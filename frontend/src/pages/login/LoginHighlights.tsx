@@ -1,5 +1,8 @@
 import type { ReactElement } from 'react';
-import { CalendarDays, Clock, FileText, Stethoscope } from 'lucide-react';
+import { CalendarDays, Clock, FileText } from 'lucide-react';
+// Ilustração genérica de recepção (sem marca), otimizada a partir de
+// references/imagensdeapoio/.
+import receptionIllustration from '../../assets/login-reception-illustration.webp';
 import styles from './LoginPage.module.css';
 
 const HIGHLIGHTS = [
@@ -27,9 +30,13 @@ const HIGHLIGHTS = [
 export function LoginHighlights(): ReactElement {
   return (
     <aside className={styles.highlightsColumn} aria-label="Recursos do sistema">
-      <div className={styles.emblem} aria-hidden="true">
-        <Stethoscope size={56} />
-      </div>
+      <img
+        src={receptionIllustration}
+        alt=""
+        className={styles.illustration}
+        width={1000}
+        height={750}
+      />
       <ul className={styles.highlights}>
         {HIGHLIGHTS.map((highlight) => (
           <li key={highlight.title} className={styles.highlight}>
