@@ -18,14 +18,16 @@ from apps.professionals.selectors import (
 from apps.queues.models import QueueEntry, QueueType
 from apps.workstations.models import StationType
 
-_CALL_STATION_TYPES = {
-    QueueType.RECEPTION: StationType.RECEPTION_DESK,
-    QueueType.CLINICAL: StationType.CONSULTATION_ROOM,
+# A fila clínica é chamada do consultório (consultas, sessões) ou da sala de
+# exames (raio-X, coleta, ultrassom...), conforme o posto de quem atende.
+_CALL_STATION_TYPES: dict[QueueType, tuple[StationType, ...]] = {
+    QueueType.RECEPTION: (StationType.RECEPTION_DESK,),
+    QueueType.CLINICAL: (StationType.CONSULTATION_ROOM, StationType.EXAM_ROOM),
 }
 
 
-def get_call_station_type(queue_type: str) -> StationType:
-    """Tipo de posto a partir do qual a fila é chamada (guichê ou consultório)."""
+def get_call_station_types(queue_type: str) -> tuple[StationType, ...]:
+    """Tipos de posto a partir dos quais a fila pode ser chamada."""
     return _CALL_STATION_TYPES[QueueType(queue_type)]
 
 

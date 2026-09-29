@@ -42,6 +42,11 @@ class AccessPermission(StrEnum):
     MEDICAL_RECORD_UPDATE_ACTIVE_PATIENT = "medical_record.update_active_patient"
     MEDICAL_RECORD_VIEW_ANY = "medical_record.view_any"
 
+    PROCEDURE_RECORD_UPDATE_OWN = "procedure_record.update_own"
+    PROCEDURE_RECORD_VIEW_ANY = "procedure_record.view_any"
+
+    CATALOG_VIEW = "catalog.view"
+
     BILLING_VIEW_HISTORY = "billing.view_history"
 
     REPORTS_VIEW_OWN = "reports.view_own"
@@ -52,6 +57,7 @@ class AccessPermission(StrEnum):
 
     WORK_SESSION_RECEPTION_DESK = "work_session.reception_desk"
     WORK_SESSION_CONSULTATION_ROOM = "work_session.consultation_room"
+    WORK_SESSION_EXAM_ROOM = "work_session.exam_room"
 
 
 _ATENDENTE_PERMISSIONS = frozenset(
@@ -67,6 +73,7 @@ _ATENDENTE_PERMISSIONS = frozenset(
         AccessPermission.RECEPTION_QUEUE_CALL,
         AccessPermission.RECEPTION_QUEUE_FORWARD,
         AccessPermission.REPORTS_VIEW_OWN,
+        AccessPermission.CATALOG_VIEW,
         AccessPermission.WORK_SESSION_RECEPTION_DESK,
     }
 )
@@ -80,16 +87,36 @@ _MEDICO_PERMISSIONS = frozenset(
         AccessPermission.ENCOUNTER_COMPLETE_OWN,
         AccessPermission.MEDICAL_RECORD_VIEW_ACTIVE_PATIENT,
         AccessPermission.MEDICAL_RECORD_UPDATE_ACTIVE_PATIENT,
+        AccessPermission.PROCEDURE_RECORD_UPDATE_OWN,
         AccessPermission.REPORTS_VIEW_OWN,
         AccessPermission.WORK_SESSION_CONSULTATION_ROOM,
     }
 )
 
-# O Gestor tem acesso administrativo total. Atos clínicos (registrar evolução e
-# iniciar/finalizar atendimento) permanecem exclusivos do médico
-# responsável: são registros assistenciais, não administrativos.
+# Mesmas regras do médico: o acesso clínico continua dependendo da fila ativa.
+_PROFISSIONAL_SAUDE_PERMISSIONS = _MEDICO_PERMISSIONS
+
+# O técnico executa o exame do paciente da própria fila, mas não consulta
+# prontuário nem histórico clínico (acesso mínimo necessário).
+_TECNICO_PERMISSIONS = frozenset(
+    {
+        AccessPermission.CLINICAL_QUEUE_VIEW_OWN,
+        AccessPermission.CLINICAL_QUEUE_VIEW_INACTIVE_OWN,
+        AccessPermission.CLINICAL_QUEUE_CALL_OWN,
+        AccessPermission.ENCOUNTER_START_OWN,
+        AccessPermission.ENCOUNTER_COMPLETE_OWN,
+        AccessPermission.PROCEDURE_RECORD_UPDATE_OWN,
+        AccessPermission.REPORTS_VIEW_OWN,
+        AccessPermission.WORK_SESSION_EXAM_ROOM,
+    }
+)
+
+# O Gestor tem acesso administrativo total. Atos clínicos (registrar evolução,
+# preencher o procedimento e iniciar/finalizar atendimento) permanecem
+# exclusivos do profissional responsável: são registros assistenciais.
 _GESTOR_PERMISSIONS = frozenset(AccessPermission) - {
     AccessPermission.MEDICAL_RECORD_UPDATE_ACTIVE_PATIENT,
+    AccessPermission.PROCEDURE_RECORD_UPDATE_OWN,
     AccessPermission.ENCOUNTER_START_OWN,
     AccessPermission.ENCOUNTER_COMPLETE_OWN,
 }
@@ -97,6 +124,8 @@ _GESTOR_PERMISSIONS = frozenset(AccessPermission) - {
 ROLE_PERMISSIONS: Mapping[str, frozenset[AccessPermission]] = {
     UserRole.ATENDENTE: _ATENDENTE_PERMISSIONS,
     UserRole.MEDICO: _MEDICO_PERMISSIONS,
+    UserRole.PROFISSIONAL_SAUDE: _PROFISSIONAL_SAUDE_PERMISSIONS,
+    UserRole.TECNICO: _TECNICO_PERMISSIONS,
     UserRole.GESTOR: _GESTOR_PERMISSIONS,
 }
 

@@ -11,7 +11,7 @@ from apps.core.exceptions import StateConflictError
 from apps.encounters.models import EncounterStatus
 from apps.encounters.services.status_transitions import change_encounter_status
 from apps.queues.models import QueueCall, QueueEntry, QueueEntryStatus, QueueType
-from apps.queues.policies import get_call_station_type
+from apps.queues.policies import get_call_station_types
 from apps.queues.services.queue_entry_authorization import ensure_can_operate_queue_entry
 from apps.queues.services.queue_entry_lookup import (
     ensure_entry_is_active,
@@ -19,7 +19,7 @@ from apps.queues.services.queue_entry_lookup import (
     lock_queue_entry,
 )
 from apps.workstations.models import WorkSession
-from apps.workstations.selectors import get_open_work_session_of_type
+from apps.workstations.selectors import get_open_work_session_of_types
 
 
 def call_queue_ticket(
@@ -63,11 +63,12 @@ def call_queue_ticket(
 
 
 def _require_work_session(caller: User, entry: QueueEntry) -> WorkSession:
-    station_type = get_call_station_type(entry.queue_type)
-    session = get_open_work_session_of_type(caller, station_type)
+    station_types = get_call_station_types(entry.queue_type)
+    session = get_open_work_session_of_types(caller, station_types)
     if session is None:
+        expected = " ou ".join(str(station_type.label) for station_type in station_types)
         raise StateConflictError(
-            f"Selecione um posto do tipo '{station_type.label}' antes de chamar pacientes.",
+            f"Selecione um posto do tipo {expected} antes de chamar pacientes.",
             code="work_session_required",
         )
     return session

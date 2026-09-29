@@ -1,5 +1,7 @@
 """Consultas de postos e sessões de trabalho."""
 
+from collections.abc import Collection
+
 from django.db.models import QuerySet
 
 from apps.accounts.models import User
@@ -21,10 +23,12 @@ def get_open_work_session(user: User) -> WorkSession | None:
     )
 
 
-def get_open_work_session_of_type(user: User, station_type: StationType) -> WorkSession | None:
-    """Sessão aberta do usuário somente se o posto for do tipo exigido."""
+def get_open_work_session_of_types(
+    user: User, station_types: Collection[StationType]
+) -> WorkSession | None:
+    """Sessão aberta do usuário somente se o posto for de um dos tipos aceitos."""
     session = get_open_work_session(user)
-    if session is None or session.station_type != station_type:
+    if session is None or session.station_type not in station_types:
         return None
     return session
 

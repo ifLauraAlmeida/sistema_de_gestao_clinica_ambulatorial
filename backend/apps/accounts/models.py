@@ -11,6 +11,12 @@ class UserRole(models.TextChoices):
 
     ATENDENTE = "ATENDENTE", "Atendente"
     MEDICO = "MEDICO", "Médico"
+    # Nutricionista, dentista, psicóloga, fonoaudióloga etc.: atendem com as
+    # mesmas regras contextuais do médico (fila própria, prontuário na fila ativa).
+    PROFISSIONAL_SAUDE = "PROFISSIONAL_SAUDE", "Profissional de saúde"
+    # Operador de raio-X, coleta laboratorial etc.: executa exames e preenche os
+    # campos do procedimento, sem acesso ao prontuário e ao histórico clínico.
+    TECNICO = "TECNICO", "Técnico de exames"
     GESTOR = "GESTOR", "Gestor"
 
 
@@ -38,7 +44,7 @@ class User(AbstractUser):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # Sem valor padrão: todo usuário precisa de perfil explícito (negado por padrão).
-    role = models.CharField("perfil", max_length=16, choices=UserRole.choices)
+    role = models.CharField("perfil", max_length=32, choices=UserRole.choices)
 
     objects: ClassVar[UserManager] = UserManager()
 

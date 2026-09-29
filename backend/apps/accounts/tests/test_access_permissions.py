@@ -106,3 +106,44 @@ def test_gestor_does_not_register_clinical_acts():
 
 def test_inactive_user_has_no_permissions():
     assert get_user_permissions(_user(UserRole.GESTOR, is_active=False)) == frozenset()
+
+
+def test_profissional_de_saude_has_same_clinical_rules_as_medico():
+    assert get_user_permissions(_user(UserRole.PROFISSIONAL_SAUDE)) == get_user_permissions(
+        _user(UserRole.MEDICO)
+    )
+
+
+@pytest.mark.parametrize(
+    "permission",
+    [
+        P.CLINICAL_QUEUE_VIEW_OWN,
+        P.CLINICAL_QUEUE_CALL_OWN,
+        P.ENCOUNTER_START_OWN,
+        P.ENCOUNTER_COMPLETE_OWN,
+        P.PROCEDURE_RECORD_UPDATE_OWN,
+        P.WORK_SESSION_EXAM_ROOM,
+    ],
+)
+def test_tecnico_executes_exams_of_own_queue(permission):
+    assert user_has_permission(_user(UserRole.TECNICO), permission)
+
+
+@pytest.mark.parametrize(
+    "permission",
+    [
+        P.MEDICAL_RECORD_VIEW_ACTIVE_PATIENT,
+        P.MEDICAL_RECORD_UPDATE_ACTIVE_PATIENT,
+        P.MEDICAL_RECORD_VIEW_ANY,
+        P.PATIENT_VIEW_DEMOGRAPHICS,
+        P.CLINICAL_QUEUE_VIEW_ALL,
+        P.WORK_SESSION_CONSULTATION_ROOM,
+        P.BILLING_VIEW_HISTORY,
+    ],
+)
+def test_tecnico_has_no_medical_record_or_administrative_access(permission):
+    assert not user_has_permission(_user(UserRole.TECNICO), permission)
+
+
+def test_gestor_does_not_fill_procedure_records():
+    assert not user_has_permission(_user(UserRole.GESTOR), P.PROCEDURE_RECORD_UPDATE_OWN)

@@ -10,6 +10,7 @@ class StationType(models.TextChoices):
 
     RECEPTION_DESK = "RECEPTION_DESK", "Guichê de recepção"
     CONSULTATION_ROOM = "CONSULTATION_ROOM", "Consultório"
+    EXAM_ROOM = "EXAM_ROOM", "Sala de exames"
 
 
 class Station(models.Model):
