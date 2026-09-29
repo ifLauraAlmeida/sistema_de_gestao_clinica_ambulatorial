@@ -131,3 +131,15 @@ def test_service_without_form_cannot_be_filled(client_for, medico, atendente):
 
     assert response.status_code == 409
     assert response.json()["error"]["code"] == "procedure_form_not_available"
+
+
+def test_optional_fields_can_be_sent_empty(client_for, tecnico, entry):
+    # Regressão: o formulário envia null para campos opcionais não preenchidos.
+    response = client_for(tecnico).put(
+        _url(entry),
+        {"values": {"incidencias": "AP", "exposicoes": None, "repeticao": None, "qualidade": None}},
+        format="json",
+    )
+
+    assert response.status_code == 200
+    assert response.json()["values"]["repeticao"] is None

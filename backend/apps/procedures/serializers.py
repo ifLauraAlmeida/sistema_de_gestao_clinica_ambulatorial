@@ -48,4 +48,5 @@ def serialize_procedure(
 
 
 class SaveProcedureRecordSerializer(serializers.Serializer[None]):
-    values = serializers.DictField(child=serializers.JSONField(), allow_empty=True)
+    # Campos opcionais não preenchidos chegam como null.
+    values = serializers.DictField(child=serializers.JSONField(allow_null=True), allow_empty=True)
