@@ -1,5 +1,6 @@
 import {
   CalendarDays,
+  BookOpen,
   ClipboardCheck,
   LayoutDashboard,
   ListOrdered,
@@ -40,6 +41,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     icon: Stethoscope,
     anyOf: ['clinical_queue.view_own', 'clinical_queue.view_all'],
   },
+  { label: 'Catálogo de serviços', path: '/catalogo', icon: BookOpen, anyOf: ['catalog.view'] },
   { label: 'Auditoria', path: '/auditoria', icon: ShieldCheck, anyOf: ['audit.view'] },
 ];
 

@@ -14,11 +14,16 @@ describe('menu por permissões', () => {
       'Agenda',
       'Check-in',
       'Fila da recepção',
+      'Catálogo de serviços',
     ]);
   });
 
   it('médico vê somente a fila clínica', () => {
     expect(labelsFor('MEDICO')).toEqual(['Dashboard', 'Fila clínica']);
+  });
+
+  it('técnico vê somente a própria fila', () => {
+    expect(labelsFor('TECNICO')).toEqual(['Dashboard', 'Fila clínica']);
   });
 
   it('gestor vê auditoria', () => {
