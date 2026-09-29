@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.db import models
 
+from apps.catalog.models import LaboratoryExam, Laterality, Service
 from apps.patients.models import Patient
 from apps.professionals.models import Professional, Specialty
 
@@ -33,7 +34,12 @@ CHECK_IN_ELIGIBLE_APPOINTMENT_STATUSES = (
 
 
 class Appointment(models.Model):
-    """Consulta marcada para um paciente com um profissional e especialidade."""
+    """
+    Serviço do catálogo marcado para um paciente com um profissional.
+
+    A especialidade é a do serviço (define o profissional apto e a senha).
+    Lateralidade, sedação e exames laboratoriais são opções do serviço escolhido.
+    """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     patient = models.ForeignKey(Patient, on_delete=models.PROTECT, related_name="appointments")
@@ -41,6 +47,17 @@ class Appointment(models.Model):
         Professional, on_delete=models.PROTECT, related_name="appointments"
     )
     specialty = models.ForeignKey(Specialty, on_delete=models.PROTECT, related_name="+")
+    # Nulo apenas em agendamentos anteriores ao catálogo de serviços.
+    service = models.ForeignKey(
+        Service, on_delete=models.PROTECT, null=True, blank=True, related_name="appointments"
+    )
+    laterality = models.CharField(
+        "lateralidade", max_length=16, choices=Laterality.choices, blank=True, default=""
+    )
+    with_sedation = models.BooleanField("com sedação", default=False)
+    laboratory_exams = models.ManyToManyField(
+        LaboratoryExam, blank=True, related_name="appointments", verbose_name="exames laboratoriais"
+    )
     scheduled_for = models.DateTimeField("data e horário")
     status = models.CharField(
         max_length=32, choices=AppointmentStatus.choices, default=AppointmentStatus.AGENDADO
@@ -60,6 +77,10 @@ class Appointment(models.Model):
             models.CheckConstraint(
                 condition=models.Q(status__in=AppointmentStatus.values),
                 name="appointment_status_valid",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(laterality="") | models.Q(laterality__in=Laterality.values),
+                name="appointment_laterality_valid",
             ),
         ]
         indexes = [

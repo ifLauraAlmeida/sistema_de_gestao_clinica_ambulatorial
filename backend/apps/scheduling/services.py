@@ -8,31 +8,40 @@ from django.db import transaction
 from apps.accounts.models import User
 from apps.audit.actions import AuditAction
 from apps.audit.services import record_audit_event
-from apps.core.exceptions import DomainError
-from apps.professionals.selectors import professional_attends_specialty
+from apps.catalog.models import Service
 from apps.scheduling.models import Appointment
+from apps.scheduling.service_options import validate_service_options
 
 
 def create_appointment(
     data: Mapping[str, Any], *, created_by: User, ip_address: str | None = None
 ) -> Appointment:
     """
-    Agenda consulta validando que o profissional atende a especialidade.
+    Agenda um serviço do catálogo, validando profissional e opções do serviço.
+
+    A especialidade do agendamento é a do serviço.
 
     Exemplo:
-        create_appointment({"patient": p, "professional": prof, "specialty": gine,
-                            "scheduled_for": horario}, created_by=atendente)
+        create_appointment({"patient": p, "professional": tecnico, "service": raio_x_joelho,
+                            "laterality": "DIREITA", "scheduled_for": horario},
+                           created_by=atendente)
     """
-    professional = data["professional"]
-    specialty = data["specialty"]
-    if not professional_attends_specialty(professional, specialty.pk):
-        raise DomainError(
-            f"O profissional não atende a especialidade informada: recebido='{specialty}'.",
-            code="professional_specialty_mismatch",
-        )
+    fields = dict(data)
+    laboratory_exams = list(fields.pop("laboratory_exams", []))
+    service: Service = fields["service"]
+    validate_service_options(
+        service,
+        fields["professional"],
+        laterality=fields.get("laterality", ""),
+        with_sedation=fields.get("with_sedation", False),
+        laboratory_exams=laboratory_exams,
+    )
 
     with transaction.atomic():
-        appointment = Appointment.objects.create(**data, created_by=created_by)
+        appointment = Appointment.objects.create(
+            **fields, specialty=service.specialty, created_by=created_by
+        )
+        appointment.laboratory_exams.set(laboratory_exams)
         record_audit_event(
             action=AuditAction.APPOINTMENT_CREATED,
             user=created_by,

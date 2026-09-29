@@ -28,9 +28,13 @@ def list_agenda(filters: AgendaFilters) -> QuerySet[Appointment]:
     Exemplo:
         list_agenda(AgendaFilters(day=date(2026, 9, 28), patient_search="maria"))
     """
-    queryset = Appointment.objects.select_related(
-        "patient", "professional__user", "specialty", "encounter"
-    ).filter(scheduled_for__date=filters.day)
+    queryset = (
+        Appointment.objects.select_related(
+            "patient", "professional__user", "specialty", "encounter", "service"
+        )
+        .prefetch_related("laboratory_exams")
+        .filter(scheduled_for__date=filters.day)
+    )
     if filters.professional_id:
         queryset = queryset.filter(professional_id=filters.professional_id)
     if filters.specialty_id:

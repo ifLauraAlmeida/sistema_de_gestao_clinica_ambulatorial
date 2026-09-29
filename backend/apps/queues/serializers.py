@@ -14,6 +14,12 @@ class QueueEntrySerializer(serializers.ModelSerializer[QueueEntry]):
     ticket_code = serializers.CharField(source="encounter.ticket_code", read_only=True)
     patient_name = serializers.CharField(source="encounter.patient.display_name", read_only=True)
     specialty_name = serializers.CharField(source="encounter.specialty.name", read_only=True)
+    service_name = serializers.CharField(
+        source="encounter.service.name", read_only=True, default=None
+    )
+    laterality_label = serializers.CharField(
+        source="encounter.get_laterality_display", read_only=True
+    )
     professional_name = serializers.CharField(
         source="encounter.professional.user.display_name", read_only=True
     )
@@ -35,6 +41,8 @@ class QueueEntrySerializer(serializers.ModelSerializer[QueueEntry]):
             "ticket_code",
             "patient_name",
             "specialty_name",
+            "service_name",
+            "laterality_label",
             "professional_name",
             "status",
             "status_label",

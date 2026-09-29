@@ -37,6 +37,9 @@ def check_in_appointment(
             appointment=appointment,
             professional=appointment.professional,
             specialty=appointment.specialty,
+            service=appointment.service,
+            laterality=appointment.laterality,
+            with_sedation=appointment.with_sedation,
             ticket_code=_next_ticket_code(appointment.specialty),
             created_by=checked_in_by,
         )
@@ -61,8 +64,8 @@ def check_in_appointment(
 
 def _lock_eligible_appointment(appointment_id: uuid.UUID) -> Appointment:
     appointment = (
-        Appointment.objects.select_for_update()
-        .select_related("patient", "professional", "specialty")
+        Appointment.objects.select_for_update(of=("self",))
+        .select_related("patient", "professional", "specialty", "service")
         .filter(pk=appointment_id)
         .first()
     )

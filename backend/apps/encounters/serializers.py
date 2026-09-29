@@ -12,6 +12,8 @@ class EncounterSummarySerializer(serializers.ModelSerializer[Encounter]):
     )
     specialty_name = serializers.CharField(source="specialty.name", read_only=True)
     status_label = serializers.CharField(source="get_status_display", read_only=True)
+    service_name = serializers.CharField(source="service.name", read_only=True, default=None)
+    laterality_label = serializers.CharField(source="get_laterality_display", read_only=True)
 
     class Meta:
         model = Encounter
@@ -29,6 +31,9 @@ class EncounterSummarySerializer(serializers.ModelSerializer[Encounter]):
             "status_label",
             "checked_in_at",
             "completed_at",
+            "service_name",
+            "laterality_label",
+            "with_sedation",
         )
         read_only_fields = fields
 

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
+from apps.catalog.models import Laterality, Service
 from apps.patients.models import Patient
 from apps.professionals.models import Professional, Specialty
 from apps.scheduling.models import Appointment
@@ -52,6 +53,14 @@ class Encounter(models.Model):
         Professional, on_delete=models.PROTECT, related_name="encounters"
     )
     specialty = models.ForeignKey(Specialty, on_delete=models.PROTECT, related_name="+")
+    # Copiados do agendamento no check-in: o que será realizado neste atendimento.
+    service = models.ForeignKey(
+        Service, on_delete=models.PROTECT, null=True, blank=True, related_name="encounters"
+    )
+    laterality = models.CharField(
+        "lateralidade", max_length=16, choices=Laterality.choices, blank=True, default=""
+    )
+    with_sedation = models.BooleanField("com sedação", default=False)
     ticket_code = models.CharField("senha", max_length=12)
     service_date = models.DateField("data do atendimento", default=timezone.localdate)
     status = models.CharField(

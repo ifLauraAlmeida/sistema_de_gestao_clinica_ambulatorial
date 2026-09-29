@@ -14,7 +14,10 @@ def _with_last_call(queryset: QuerySet[QueueEntry]) -> QuerySet[QueueEntry]:
     """Carrega relações exibidas e dados da última chamada sem consultas N+1."""
     last_call = QueueCall.objects.filter(queue_entry=OuterRef("pk")).order_by("-called_at")
     return queryset.select_related(
-        "encounter__patient", "encounter__specialty", "encounter__professional__user"
+        "encounter__patient",
+        "encounter__specialty",
+        "encounter__service",
+        "encounter__professional__user",
     ).annotate(
         last_call_destination=Subquery(last_call.values("destination_label")[:1]),
         last_called_at=Subquery(last_call.values("called_at")[:1]),

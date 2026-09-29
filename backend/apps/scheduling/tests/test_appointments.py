@@ -2,6 +2,8 @@ import pytest
 from django.utils import timezone
 
 from apps.audit.models import AuditEvent
+from apps.catalog.models import ServiceType
+from apps.catalog.tests.factories import create_service
 from apps.patients.tests.factories import create_patient
 from apps.professionals.tests.factories import create_professional, create_specialty
 from apps.scheduling.models import Appointment
@@ -22,34 +24,57 @@ def agenda_context(medico, atendente):
     }
 
 
-def _payload(ctx, **overrides):
+@pytest.fixture
+def consultation(agenda_context):
+    return create_service(
+        "Consulta de teste — primeira consulta",
+        specialty=agenda_context["specialty"],
+        category="Consultas e atendimentos",
+        group="Teste",
+        service_type=ServiceType.CONSULTA,
+    )
+
+
+def _payload(ctx, service=None, **overrides):
     payload = {
         "patient": str(ctx["patient"].id),
         "professional": str(ctx["professional"].id),
-        "specialty": str(ctx["specialty"].id),
+        "service": str(service.id) if service else None,
         "scheduled_for": timezone.now().isoformat(),
     }
     payload.update(overrides)
     return payload
 
 
-def test_atendente_creates_appointment(client_for, atendente, agenda_context):
-    response = client_for(atendente).post(URL, _payload(agenda_context), format="json")
+def test_atendente_creates_appointment_for_catalog_service(
+    client_for, atendente, agenda_context, consultation
+):
+    response = client_for(atendente).post(
+        URL, _payload(agenda_context, consultation), format="json"
+    )
 
     assert response.status_code == 201
-    assert response.json()["status"] == "AGENDADO"
+    body = response.json()
+    assert body["status"] == "AGENDADO"
+    assert body["service_name"] == "Consulta de teste — primeira consulta"
+    assert body["specialty"] == str(agenda_context["specialty"].id)
     assert AuditEvent.objects.filter(action="APPOINTMENT_CREATED").exists()
 
 
-def test_appointment_requires_specialty_of_professional(client_for, atendente, agenda_context):
-    orto = create_specialty("Ortopedia", "ORTO")
+def test_professional_must_perform_the_service(client_for, atendente, agenda_context):
+    x_ray = create_service("Raio-X de tórax PA")
 
-    response = client_for(atendente).post(
-        URL, _payload(agenda_context, specialty=str(orto.id)), format="json"
-    )
+    response = client_for(atendente).post(URL, _payload(agenda_context, x_ray), format="json")
 
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "professional_specialty_mismatch"
+
+
+def test_service_is_required(client_for, atendente, agenda_context):
+    response = client_for(atendente).post(URL, _payload(agenda_context), format="json")
+
+    assert response.status_code == 400
+    assert "service" in response.json()["error"]["details"]
 
 
 def test_atendente_views_day_agenda(client_for, atendente, agenda_context):
