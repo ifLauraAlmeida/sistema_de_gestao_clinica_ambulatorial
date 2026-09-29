@@ -1,6 +1,7 @@
 """Construção do fluxo recepção → fila clínica com dados fictícios."""
 
 from apps.accounts.models import User
+from apps.catalog.models import Service
 from apps.encounters.models import Encounter
 from apps.encounters.services.check_in import check_in_appointment
 from apps.patients.tests.factories import create_patient
@@ -21,13 +22,21 @@ def ensure_professional(doctor: User, specialty: Specialty | None = None) -> Pro
 
 
 def check_in_new_patient(
-    doctor: User, receptionist: User, patient_name: str = "Paciente Fictício"
+    doctor: User,
+    receptionist: User,
+    patient_name: str = "Paciente Fictício",
+    service: Service | None = None,
 ) -> Encounter:
-    """Agenda um paciente fictício com o médico e faz o check-in."""
+    """Agenda um paciente fictício com o profissional e faz o check-in."""
     professional = ensure_professional(doctor)
-    specialty = professional.specialties.get()
+    specialty = service.specialty if service else professional.specialties.get()
     appointment = create_appointment(
-        create_patient(patient_name), professional, specialty, created_by=receptionist
+        create_patient(patient_name),
+        professional,
+        specialty,
+        created_by=receptionist,
+        service=service,
+        laterality="DIREITA" if service and service.requires_laterality else "",
     )
     return check_in_appointment(appointment.id, checked_in_by=receptionist)
 
@@ -37,8 +46,11 @@ def reception_entry_of(encounter: Encounter) -> QueueEntry:
 
 
 def place_in_clinical_queue(
-    doctor: User, receptionist: User, patient_name: str = "Paciente Fictício"
+    doctor: User,
+    receptionist: User,
+    patient_name: str = "Paciente Fictício",
+    service: Service | None = None,
 ) -> QueueEntry:
-    """Leva um paciente fictício até a fila clínica ativa do médico."""
-    encounter = check_in_new_patient(doctor, receptionist, patient_name)
+    """Leva um paciente fictício até a fila clínica ativa do profissional."""
+    encounter = check_in_new_patient(doctor, receptionist, patient_name, service)
     return forward_to_clinical_queue(reception_entry_of(encounter).id, forwarded_by=receptionist)

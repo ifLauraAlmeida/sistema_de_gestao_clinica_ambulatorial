@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "apps.encounters",
     "apps.queues",
     "apps.medical_records",
+    "apps.procedures",
     "apps.demo_data",
 ]
 

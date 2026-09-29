@@ -3,6 +3,7 @@ from datetime import datetime
 from django.utils import timezone
 
 from apps.accounts.models import User
+from apps.catalog.models import Service
 from apps.patients.models import Patient
 from apps.professionals.models import Professional, Specialty
 from apps.scheduling.models import Appointment
@@ -14,6 +15,8 @@ def create_appointment(
     specialty: Specialty,
     created_by: User,
     scheduled_for: datetime | None = None,
+    service: Service | None = None,
+    laterality: str = "",
 ) -> Appointment:
     return Appointment.objects.create(
         patient=patient,
@@ -21,4 +24,6 @@ def create_appointment(
         specialty=specialty,
         created_by=created_by,
         scheduled_for=scheduled_for or timezone.now(),
+        service=service,
+        laterality=laterality,
     )
