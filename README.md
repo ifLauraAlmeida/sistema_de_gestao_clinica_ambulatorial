@@ -14,7 +14,8 @@ O escopo funcional completo está em [`references/escopo_sistema.md`](references
 
 - monorepo com `backend/` (Django + DRF) e `frontend/` (React + TypeScript + Vite);
 - PostgreSQL como banco oficial e Redis preparado para tempo real (Django Channels);
-- Custom User Model com perfis **ATENDENTE**, **MEDICO** e **GESTOR**;
+- Custom User Model com perfis **ATENDENTE**, **MEDICO**, **PROFISSIONAL_SAUDE**, **TECNICO** e **GESTOR**;
+- catálogo de serviços (área → grupo → serviço), exames laboratoriais, pacotes e formulários de execução por procedimento;
 - RBAC com permissões granulares + autorização contextual no backend;
 - sessão de trabalho (guichê/consultório) obrigatória para atendente e médico;
 - check-in, fila da recepção, fila clínica ativa/inativa, chamadas com destino histórico;
@@ -76,7 +77,9 @@ Cada domínio é um app Django em `backend/apps/`. Views apenas coordenam (valid
 | `scheduling` | agendamentos |
 | `encounters` | check-in, atendimento, histórico de status, finalização (ATENDIDO) |
 | `queues` | fila da recepção, fila clínica, chamadas (`QueueCall`) e encaminhamento |
+| `catalog` | catálogo de serviços, sinônimos, formulários de execução, exames laboratoriais e pacotes |
 | `medical_records` | evolução clínica mínima e política de acesso ao prontuário |
+| `procedures` | registro versionado da execução do procedimento (campos do formulário do serviço) |
 | `demo_data` | comando de dados fictícios para desenvolvimento |
 
 ### Organização do frontend
@@ -167,7 +170,28 @@ make seed
 # ou: docker compose run --rm backend python manage.py seed_demo_data --password "<senha>"
 ```
 
-Cria usuários `recepcao.demo` (atendente), `medica.demo` e `medico.demo` (médicos), `gestao.demo` (gestor), guichês, consultórios, especialidades, pacientes **fictícios** (sem CPF) e a agenda do dia com parte dos pacientes em fila. O comando recusa execução com `DJANGO_DEBUG=false`.
+Carrega o catálogo e cria usuários de todos os perfis (tabela abaixo), guichês, consultórios, salas de exames, pacientes **fictícios** (sem CPF, telefones com DDD 00) e a agenda do dia por serviço, com parte dos pacientes em fila. O comando recusa execução com `DJANGO_DEBUG=false`. A agenda por serviço é criada uma vez por dia: rode `make seed` a cada novo dia de testes.
+
+| Usuário | Perfil | Atua em |
+|---|---|---|
+| `recepcao.demo`, `recepcao2.demo` | Atendente | guichês |
+| `medica.demo` | Médica | Pediatria, Ultrassonografia, Doppler (consultório) |
+| `medico.demo` | Médico | Ortopedia (consultório) |
+| `nutri.demo` | Profissional de saúde | Nutrição (consultório) |
+| `dentista.demo` | Profissional de saúde | Odontologia (consultório) |
+| `psico.demo` | Profissional de saúde | Psicologia (consultório) |
+| `fono.demo` | Profissional de saúde | Audiologia (consultório) |
+| `tecnico.rx` | Técnico de exames | Raios-X, Mamografia, Densitometria (sala de exames) |
+| `tecnico.lab` | Técnico de exames | Laboratório (sala de coleta) |
+| `gestao.demo` | Gestor | todas as áreas, `/admin` |
+
+### Catálogo de serviços
+
+```bash
+docker compose run --rm backend python manage.py load_service_catalog
+```
+
+Cria ou atualiza especialidades, formulários de execução, serviços, exames laboratoriais e pacotes (`backend/apps/catalog/catalog_data.py`). Pode ser executado em produção e várias vezes: preços de referência e pacotes ajustados pelo gestor no `/admin` não são sobrescritos. Durações e preparos são sugestões iniciais a revisar. "Pesquisa de refluxo" não foi cadastrada até a clínica informar o nome técnico do exame.
 
 ### 4. Superusuário
 
@@ -268,29 +292,34 @@ A autorização real acontece **sempre no backend**. O frontend recebe a lista d
 2. **Autorização contextual** — políticas por domínio decidem o que depende de contexto:
    - `queues/policies.py`: médico só consulta e chama a **própria** fila, na especialidade em que atende; chamadas exigem sessão de trabalho no tipo de posto correto;
    - `medical_records/policies.py`: prontuário/histórico só enquanto o atendimento do paciente está na **fila ativa** do médico; finalizar como ATENDIDO revoga esse vínculo (os registros permanecem);
-   - `workstations/policies.py`: atendente ocupa guichês; médico ocupa consultórios.
+   - `procedures/policies.py`: campos do procedimento só para o profissional responsável com o atendimento na fila ativa; gestor apenas consulta;
+   - `workstations/policies.py`: atendente ocupa guichês; médico e profissional de saúde ocupam consultórios; técnico ocupa salas de exames.
 
-| Funcionalidade | Atendente | Médico | Gestor |
-|---|---|---|---|
-| Criar paciente / dados cadastrais | sim | não (vê identificação no prontuário) | sim |
-| Agenda | sim | não (futuro/contextual) | sim |
-| Check-in, fila da recepção, chamar para guichê | sim | não | sim |
-| Fila clínica própria (ativa/inativa), chamar para consultório | não | sim (própria) | sim (todas) |
-| Prontuário e histórico clínico | não | somente fila ativa | sim (auditado) |
-| Registrar evolução, iniciar e finalizar atendimento | não | sim (próprio atendimento) | não¹ |
-| Histórico financeiro, indicadores gerais, auditoria, usuários | não | não | sim |
+Profissional de saúde (nutrição, odontologia, psicologia, fonoaudiologia) segue as mesmas regras do médico. Técnico de exames executa exames da própria fila **sem acesso ao prontuário e ao histórico clínico**.
 
-¹ Decisão: o gestor tem acesso administrativo total, mas atos clínicos (evolução, início e finalização do atendimento) permanecem exclusivos do médico responsável.
+| Funcionalidade | Atendente | Médico / Prof. de saúde | Técnico | Gestor |
+|---|---|---|---|---|
+| Criar paciente / dados cadastrais | sim | não (identificação no atendimento) | não (identificação no atendimento) | sim |
+| Agenda, catálogo | sim | não | não | sim |
+| Check-in, fila da recepção, chamar para guichê | sim | não | não | sim |
+| Fila própria (ativa/inativa), chamar | não | sim, do consultório | sim, da sala de exames | sim (todas) |
+| Prontuário e histórico clínico | não | somente fila ativa | não | sim (auditado) |
+| Campos do procedimento | não | preenche (fila ativa) | preenche (fila ativa) | consulta |
+| Registrar evolução | não | sim (fila ativa) | não | não¹ |
+| Iniciar, finalizar, registrar falta | não | sim (próprio atendimento) | sim (próprio atendimento) | não¹ |
+| Histórico financeiro, indicadores gerais, auditoria, usuários | não | não | não | sim |
+
+¹ Decisão: o gestor tem acesso administrativo total, mas atos assistenciais (evolução, preenchimento de procedimento, início e finalização do atendimento) permanecem exclusivos do profissional responsável.
 
 ---
 
-## Sessão de trabalho (guichê e consultório)
+## Sessão de trabalho (guichê, consultório e sala de exames)
 
 Guichê e consultório **não** são atributos do usuário. Após o login, atendente e médico escolhem o posto em `/workstation`, o que cria uma `WorkSession` (`user`, `station`, `station_type`, `started_at`, `ended_at`). Regras:
 
 - uma sessão aberta por usuário (constraint no banco); trocar de posto encerra a anterior;
 - login e logout encerram sessões esquecidas abertas (cada login exige nova seleção);
-- chamadas exigem sessão aberta no tipo de posto da fila (guichê para recepção, consultório para fila clínica);
+- chamadas exigem sessão aberta no tipo de posto da fila (guichê para recepção; consultório ou sala de exames para a fila clínica);
 - cada `QueueCall` grava `destination_type`, `destination_id` e `destination_label` como **snapshot**: trocar de posto depois não altera o histórico ("GINE04 chamada para Consultório 03 às 14:32" continua verdadeiro).
 
 | Método | Endpoint |
@@ -306,7 +335,9 @@ Guichê e consultório **não** são atributos do usuário. Após o login, atend
 |---|---|---|
 | GET/POST | `/api/v1/patients/` | `patient.view_demographics` / `patient.create` |
 | GET/PATCH | `/api/v1/patients/{id}/` | `patient.view_demographics` / `patient.update_demographics` |
-| GET/POST | `/api/v1/appointments/?date=&professional=&specialty=&search=` | `appointment.view` / `appointment.create` |
+| GET/POST | `/api/v1/appointments/?date=&professional=&specialty=&search=` | `appointment.view` / `appointment.create` (POST: `service`, `laterality`, `with_sedation`, `laboratory_exams`) |
+| GET | `/api/v1/catalog/`, `/api/v1/catalog/services/?search=`, `/api/v1/catalog/laboratory-exams/`, `/api/v1/catalog/packages/` | `catalog.view` |
+| GET/PUT | `/api/v1/encounters/{id}/procedure/` | política de procedimento (responsável na fila ativa; gestor só GET) |
 | GET | `/api/v1/professionals/` | `appointment.view` |
 | PATCH | `/api/v1/appointments/{id}/` | `appointment.update` |
 | POST | `/api/v1/check-ins/` | `checkin.create` |
