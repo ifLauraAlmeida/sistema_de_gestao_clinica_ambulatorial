@@ -7,11 +7,12 @@ from django.db import transaction
 from apps.accounts.models import User
 from apps.audit.actions import AuditAction
 from apps.audit.services import record_audit_event
-from apps.core.exceptions import AccessDeniedError, StateConflictError
+from apps.core.exceptions import StateConflictError
 from apps.encounters.models import EncounterStatus
 from apps.encounters.services.status_transitions import change_encounter_status
 from apps.queues.models import QueueCall, QueueEntry, QueueEntryStatus, QueueType
-from apps.queues.policies import can_call_queue_entry, get_call_station_type
+from apps.queues.policies import get_call_station_type
+from apps.queues.services.queue_entry_authorization import ensure_can_operate_queue_entry
 from apps.queues.services.queue_entry_lookup import (
     ensure_entry_is_active,
     find_queue_entry,
@@ -37,7 +38,8 @@ def call_queue_ticket(
     Exemplo:
         call_queue_ticket(entrada.id, QueueType.RECEPTION, caller=atendente)
     """
-    _ensure_can_call(caller, find_queue_entry(entry_id, queue_type), ip_address)
+    # Executado fora da transação: a auditoria da negação precisa persistir.
+    ensure_can_operate_queue_entry(caller, find_queue_entry(entry_id, queue_type), ip_address)
 
     with transaction.atomic():
         entry = lock_queue_entry(entry_id, queue_type)
@@ -58,24 +60,6 @@ def call_queue_ticket(
             },
         )
     return call
-
-
-def _ensure_can_call(caller: User, entry: QueueEntry, ip_address: str | None) -> None:
-    # Executado fora da transação: a auditoria da negação precisa persistir.
-    if can_call_queue_entry(caller, entry):
-        return
-    record_audit_event(
-        action=AuditAction.ACCESS_DENIED,
-        user=caller,
-        entity_type="queue_entry",
-        entity_id=str(entry.pk),
-        ip_address=ip_address,
-        metadata={"reason": "queue_call_not_allowed", "queue_type": entry.queue_type},
-    )
-    raise AccessDeniedError(
-        "Você não pode chamar esta senha: ela não pertence a uma fila sob sua responsabilidade.",
-        code="queue_call_not_allowed",
-    )
 
 
 def _require_work_session(caller: User, entry: QueueEntry) -> WorkSession:
