@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "apps.workstations",
     "apps.patients",
     "apps.professionals",
+    "apps.catalog",
     "apps.scheduling",
     "apps.encounters",
     "apps.queues",
