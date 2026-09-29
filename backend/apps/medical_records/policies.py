@@ -12,12 +12,8 @@ from enum import StrEnum
 
 from apps.accounts.access_permissions import AccessPermission, user_has_permission
 from apps.accounts.models import User
+from apps.encounters.active_link import find_active_link_denial
 from apps.encounters.models import Encounter
-from apps.professionals.selectors import (
-    get_active_professional_for_user,
-    professional_attends_specialty,
-)
-from apps.queues.models import ACTIVE_QUEUE_ENTRY_STATUSES, QueueType
 
 
 class AccessReason(StrEnum):
@@ -69,24 +65,7 @@ def _evaluate_active_queue_link(
 ) -> AccessDecision:
     if not user_has_permission(user, permission):
         return AccessDecision(False, AccessReason.ROLE_WITHOUT_CLINICAL_ACCESS)
-
-    professional = get_active_professional_for_user(user)
-    if professional is None:
-        return AccessDecision(False, AccessReason.NO_PROFESSIONAL_PROFILE)
-    if encounter.professional_id != professional.pk:
-        return AccessDecision(False, AccessReason.ENCOUNTER_OF_ANOTHER_PROFESSIONAL)
-    if not encounter.is_clinically_active:
-        return AccessDecision(False, AccessReason.ENCOUNTER_NOT_ACTIVE)
-    if not _is_in_active_clinical_queue(encounter):
-        return AccessDecision(False, AccessReason.NOT_IN_ACTIVE_QUEUE)
-    if not professional_attends_specialty(professional, encounter.specialty_id):
-        return AccessDecision(False, AccessReason.SPECIALTY_NOT_ALLOWED)
+    denial = find_active_link_denial(user, encounter)
+    if denial is not None:
+        return AccessDecision(False, AccessReason(denial.value))
     return AccessDecision(True, AccessReason.ACTIVE_QUEUE_ENCOUNTER)
-
-
-def _is_in_active_clinical_queue(encounter: Encounter) -> bool:
-    return encounter.queue_entries.filter(
-        queue_type=QueueType.CLINICAL,
-        professional_id=encounter.professional_id,
-        status__in=ACTIVE_QUEUE_ENTRY_STATUSES,
-    ).exists()
