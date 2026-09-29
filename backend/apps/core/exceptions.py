@@ -1,5 +1,6 @@
 """Exceções de domínio convertidas em respostas de API padronizadas."""
 
+from collections.abc import Mapping
 from http import HTTPStatus
 
 
@@ -17,10 +18,18 @@ class DomainError(Exception):
     status_code: int = HTTPStatus.BAD_REQUEST
     default_code: str = "domain_error"
 
-    def __init__(self, message: str, *, code: str | None = None) -> None:
+    def __init__(
+        self,
+        message: str,
+        *,
+        code: str | None = None,
+        details: Mapping[str, list[str]] | None = None,
+    ) -> None:
         super().__init__(message)
         self.message = message
         self.code = code or self.default_code
+        # Erros por campo, no mesmo formato de `details` da validação da API.
+        self.details = dict(details) if details else None
 
 
 class AccessDeniedError(DomainError):

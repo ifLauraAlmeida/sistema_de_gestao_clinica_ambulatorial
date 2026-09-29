@@ -39,7 +39,10 @@ def handle_api_exception(exc: Exception, context: dict[str, Any]) -> Response:
     """Converte exceções em respostas no formato padronizado da API."""
     if isinstance(exc, DomainError):
         set_rollback()
-        return Response(build_error_body(exc.code, exc.message), status=exc.status_code)
+        return Response(
+            build_error_body(exc.code, exc.message, details=exc.details),
+            status=exc.status_code,
+        )
 
     response = drf_exception_handler(exc, context)
     if response is None:
