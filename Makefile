@@ -24,7 +24,7 @@ makemigrations:
 createsuperuser: ## Cria usuário gestor com acesso ao /admin
 	$(COMPOSE) run --rm backend python manage.py createsuperuser
 
-seed: ## Cria dados FICTÍCIOS (exige DEMO_USERS_PASSWORD no ambiente ou no .env)
+seed: migrate ## Cria dados FICTÍCIOS (exige DEMO_USERS_PASSWORD no ambiente ou no .env)
 	$(BACKEND_RUN) python manage.py seed_demo_data
 
 test: test-backend test-frontend ## Executa todos os testes
