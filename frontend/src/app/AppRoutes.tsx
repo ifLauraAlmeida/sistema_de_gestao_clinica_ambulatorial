@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { MainLayout } from '../layouts/MainLayout';
 import { AgendaPage } from '../pages/agenda/AgendaPage';
+import { CatalogPage } from '../pages/catalog/CatalogPage';
 import { CheckInPage } from '../pages/checkIn/CheckInPage';
 import { ClinicalQueuePage } from '../pages/clinicalQueue/ClinicalQueuePage';
 import { DashboardPage } from '../pages/dashboard/DashboardPage';
@@ -27,6 +28,7 @@ const MODULE_PAGES: Record<string, ReactElement> = {
   '/check-in': <CheckInPage />,
   '/fila-recepcao': <ReceptionQueuePage />,
   '/fila-clinica': <ClinicalQueuePage />,
+  '/catalogo': <CatalogPage />,
 };
 
 const PLACEHOLDER_DESCRIPTIONS: Record<string, string> = {
@@ -68,7 +70,12 @@ export function AppRoutes(): ReactElement {
             <Route
               element={
                 <RequirePermission
-                  anyOf={['medical_record.view_active_patient', 'medical_record.view_any']}
+                  anyOf={[
+                    'medical_record.view_active_patient',
+                    'medical_record.view_any',
+                    'procedure_record.update_own',
+                    'procedure_record.view_any',
+                  ]}
                 />
               }
             >

@@ -4,7 +4,7 @@ const API_BASE_PATH = '/api/v1';
 const CSRF_COOKIE_NAME = 'csrftoken';
 const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
-type HttpMethod = 'GET' | 'POST' | 'PATCH';
+type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT';
 
 /** Erro retornado pela API no formato `{ error: { code, message } }`. */
 export class ApiError extends Error {
@@ -82,6 +82,7 @@ export const apiClient = {
   get: <T>(path: string): Promise<T> => request<T>('GET', path),
   post: <T>(path: string, body?: unknown): Promise<T> => request<T>('POST', path, body),
   patch: <T>(path: string, body?: unknown): Promise<T> => request<T>('PATCH', path, body),
+  put: <T>(path: string, body?: unknown): Promise<T> => request<T>('PUT', path, body),
 };
 
 /**

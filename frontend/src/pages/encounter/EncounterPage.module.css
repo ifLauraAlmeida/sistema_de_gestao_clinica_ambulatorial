@@ -125,3 +125,33 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.procedureFields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+.infoList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.infoRow {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-gray-100);
+  font-size: var(--font-size-sm);
+}
+
+.infoRow dt {
+  color: var(--text-muted);
+}
+
+.infoRow dd {
+  margin: 0;
+  color: var(--text-strong);
+}

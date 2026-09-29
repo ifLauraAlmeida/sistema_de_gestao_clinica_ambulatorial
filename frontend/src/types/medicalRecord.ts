@@ -11,6 +11,9 @@ export interface EncounterSummary {
   status_label: string;
   checked_in_at: string;
   completed_at: string | null;
+  service_name: string | null;
+  laterality_label: string;
+  with_sedation: boolean;
 }
 
 export interface PatientSummary {

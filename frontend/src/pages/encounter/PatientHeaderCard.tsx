@@ -1,13 +1,19 @@
 import type { ReactElement } from 'react';
 import { CalendarDays, Stethoscope, Ticket, UserRound } from 'lucide-react';
 import { Badge } from '../../components/ui/Badge';
-import type { MedicalRecord } from '../../types/medicalRecord';
+import type { EncounterSummary, PatientSummary } from '../../types/medicalRecord';
+import { serviceWithLaterality } from '../../utils/serviceLabels';
 import { formatIsoDate } from '../../utils/dateTime';
 import styles from './EncounterPage.module.css';
 
 /** Identificação do paciente e do atendimento no topo do prontuário. */
-export function PatientHeaderCard({ record }: { record: MedicalRecord }): ReactElement {
-  const { patient, encounter } = record;
+export function PatientHeaderCard({
+  patient,
+  encounter,
+}: {
+  patient: PatientSummary;
+  encounter: EncounterSummary;
+}): ReactElement {
   const facts = [
     {
       icon: <CalendarDays size={22} />,
@@ -15,7 +21,13 @@ export function PatientHeaderCard({ record }: { record: MedicalRecord }): ReactE
       value: `${patient.age} anos`,
       detail: formatIsoDate(patient.birth_date),
     },
-    { icon: <Stethoscope size={22} />, label: 'Especialidade', value: encounter.specialty_name },
+    {
+      icon: <Stethoscope size={22} />,
+      label: 'Serviço',
+      value: encounter.service_name
+        ? serviceWithLaterality(encounter.service_name, encounter.laterality_label)
+        : encounter.specialty_name,
+    },
     { icon: <Ticket size={22} />, label: 'Senha', value: encounter.ticket_code },
   ];
 
