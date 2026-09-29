@@ -1,6 +1,6 @@
 export type QueueType = 'RECEPTION' | 'CLINICAL';
 
-export type QueueEntryStatus = 'WAITING' | 'CALLED' | 'FINISHED' | 'CANCELLED';
+export type QueueEntryStatus = 'WAITING' | 'CALLED' | 'FINISHED' | 'CANCELLED' | 'NO_SHOW';
 
 export type EncounterStatus =
   | 'CHECK_IN_REALIZADO'

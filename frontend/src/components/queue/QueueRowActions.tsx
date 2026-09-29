@@ -1,9 +1,16 @@
 import type { ReactElement } from 'react';
-import { ArrowRightCircle, CheckCircle2, Megaphone, PlayCircle, RotateCcw } from 'lucide-react';
+import {
+  ArrowRightCircle,
+  CheckCircle2,
+  Megaphone,
+  PlayCircle,
+  RotateCcw,
+  UserX,
+} from 'lucide-react';
 import { Button } from '../ui/Button';
 import { EncounterRecordLink } from './EncounterRecordLink';
 import type { QueueEntry } from '../../types/queue';
-import { canCompleteEncounter, canStartEncounter } from '../../utils/queueMetrics';
+import { canCompleteEncounter, canMarkNoShow, canStartEncounter } from '../../utils/queueMetrics';
 import styles from './Queue.module.css';
 
 interface QueueRowActionsProps {
@@ -14,6 +21,8 @@ interface QueueRowActionsProps {
   onCall: (entry: QueueEntry) => void;
   onForward?: (entry: QueueEntry) => void;
   onStart?: (entry: QueueEntry) => void;
+  /** Abre a confirmação de não comparecimento (somente senhas já chamadas). */
+  onNoShow?: (entry: QueueEntry) => void;
   onComplete?: (entry: QueueEntry) => void;
   /** Exibe o acesso à tela de atendimento/prontuário. */
   showRecordLink?: boolean;
@@ -31,6 +40,7 @@ export function QueueRowActions({
   onCall,
   onForward,
   onStart,
+  onNoShow,
   onComplete,
   showRecordLink = false,
 }: QueueRowActionsProps): ReactElement {
@@ -68,6 +78,16 @@ export function QueueRowActions({
           onClick={() => onStart(entry)}
         >
           Iniciar atendimento
+        </Button>
+      )}
+      {onNoShow && canMarkNoShow(entry) && (
+        <Button
+          variant="danger"
+          icon={<UserX size={16} />}
+          disabled={busyKey !== null}
+          onClick={() => onNoShow(entry)}
+        >
+          Não compareceu
         </Button>
       )}
       {showRecordLink && <EncounterRecordLink encounterId={entry.encounter_id} />}

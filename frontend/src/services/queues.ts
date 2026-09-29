@@ -45,3 +45,13 @@ export async function startEncounter(encounterId: string): Promise<void> {
 export async function completeEncounter(encounterId: string): Promise<void> {
   await apiClient.post<undefined>(`/encounters/${encounterId}/complete/`);
 }
+
+/** Registra falta de senha já chamada na recepção. Irreversível. */
+export async function markReceptionNoShow(entryId: string): Promise<void> {
+  await apiClient.post<undefined>(`/reception-queue/${entryId}/no-show/`);
+}
+
+/** Registra falta de senha já chamada na própria fila clínica. Irreversível. */
+export async function markClinicalNoShow(entryId: string): Promise<void> {
+  await apiClient.post<undefined>(`/clinical-queue/${entryId}/no-show/`);
+}

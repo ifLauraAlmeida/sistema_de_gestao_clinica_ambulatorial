@@ -1,0 +1,68 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: rgb(15 42 92 / 45%);
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: min(560px, 100%);
+  padding: var(--space-6);
+  border-top: 4px solid var(--color-red-600);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.header h2 {
+  font-size: var(--font-size-lg);
+}
+
+.icon {
+  display: inline-flex;
+  padding: var(--space-2);
+  border-radius: 50%;
+  background: var(--color-red-50);
+  color: var(--color-red-600);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  color: var(--text-body);
+  font-size: var(--font-size-sm);
+}
+
+.instruction {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.word {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-red-50);
+  color: var(--color-red-600);
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  user-select: none;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}

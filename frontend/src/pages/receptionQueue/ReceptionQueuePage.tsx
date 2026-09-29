@@ -14,12 +14,14 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { useApiResource } from '../../hooks/useApiResource';
 import { useCurrentUser } from '../../hooks/useAuth';
 import { useNow } from '../../hooks/useNow';
+import { useNoShowConfirmation } from '../../hooks/useNoShowConfirmation';
 import { useQueueOperation } from '../../hooks/useQueueOperation';
 import {
   callReceptionTicket,
   forwardToClinicalQueue,
   listRecentReceptionCalls,
   listReceptionQueue,
+  markReceptionNoShow,
 } from '../../services/queues';
 import type { QueueEntry } from '../../types/queue';
 import { resolveSelectedEntry, summarizeQueue } from '../../utils/queueMetrics';
@@ -44,6 +46,7 @@ export function ReceptionQueuePage(): ReactElement {
   }, [reloadQueue, reloadCalls]);
   const operation = useQueueOperation(reloadAll);
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
+  const noShow = useNoShowConfirmation(markReceptionNoShow, operation.run, operation.busyKey);
 
   const entries = queue.data ?? [];
   const destination = user.active_work_session?.station.name;
@@ -89,6 +92,7 @@ export function ReceptionQueuePage(): ReactElement {
                 canCall={canCall}
                 hasDestination={Boolean(destination)}
                 onCall={callTicket}
+                onNoShow={noShow.requestNoShow}
                 onForward={canForward ? forwardTicket : undefined}
               />
             )}
@@ -109,6 +113,7 @@ export function ReceptionQueuePage(): ReactElement {
         )}
         <RecentCallsCard calls={calls.data ?? []} />
       </div>
+      {noShow.dialog}
     </>
   );
 }

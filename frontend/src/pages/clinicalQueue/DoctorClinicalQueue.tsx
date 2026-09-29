@@ -14,8 +14,14 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { useApiResource } from '../../hooks/useApiResource';
 import { useCurrentUser } from '../../hooks/useAuth';
 import { useNow } from '../../hooks/useNow';
+import { useNoShowConfirmation } from '../../hooks/useNoShowConfirmation';
 import { useQueueOperation } from '../../hooks/useQueueOperation';
-import { callClinicalTicket, listClinicalQueue, startEncounter } from '../../services/queues';
+import {
+  callClinicalTicket,
+  listClinicalQueue,
+  markClinicalNoShow,
+  startEncounter,
+} from '../../services/queues';
 import type { QueueEntry } from '../../types/queue';
 import { resolveSelectedEntry, summarizeQueue } from '../../utils/queueMetrics';
 import grid from '../../layouts/PageGrid.module.css';
@@ -40,6 +46,7 @@ export function DoctorClinicalQueue(): ReactElement {
   }, [reloadActive, reloadInactive]);
   const operation = useQueueOperation(reloadAll);
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
+  const noShow = useNoShowConfirmation(markClinicalNoShow, operation.run, operation.busyKey);
   // Mensagem enviada pela tela de atendimento após a finalização.
   const flashMessage = (useLocation().state as { message?: string } | null)?.message;
 
@@ -87,6 +94,7 @@ export function DoctorClinicalQueue(): ReactElement {
                 canCall
                 hasDestination={Boolean(room)}
                 onCall={callTicket}
+                onNoShow={noShow.requestNoShow}
                 onStart={startTicket}
                 showRecordLink
               />
@@ -114,6 +122,7 @@ export function DoctorClinicalQueue(): ReactElement {
           />
         </Card>
       </div>
+      {noShow.dialog}
     </>
   );
 }

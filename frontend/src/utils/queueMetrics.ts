@@ -67,3 +67,11 @@ export function canStartEncounter(entry: QueueEntry): boolean {
 export function canCompleteEncounter(entry: QueueEntry): boolean {
   return entry.encounter_status === 'CHAMADO' || entry.encounter_status === 'EM_ATENDIMENTO';
 }
+
+/**
+ * Falta só pode ser registrada para senha já chamada e paciente ainda fora do
+ * consultório (o backend aplica a mesma regra).
+ */
+export function canMarkNoShow(entry: QueueEntry): boolean {
+  return entry.status === 'CALLED' && entry.encounter_status !== 'EM_ATENDIMENTO';
+}

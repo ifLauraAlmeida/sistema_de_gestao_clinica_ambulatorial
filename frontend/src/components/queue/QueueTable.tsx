@@ -12,6 +12,7 @@ const STATUS_TONES: Record<QueueEntryStatus, BadgeTone> = {
   CALLED: 'warning',
   FINISHED: 'success',
   CANCELLED: 'neutral',
+  NO_SHOW: 'danger',
 };
 
 interface QueueTableProps {
@@ -82,7 +83,9 @@ export function QueueTable({
  */
 function statusLabelOf(entry: QueueEntry): string {
   const showsEncounterStage =
-    entry.status === 'FINISHED' || entry.encounter_status === 'EM_ATENDIMENTO';
+    entry.status === 'FINISHED' ||
+    entry.status === 'NO_SHOW' ||
+    entry.encounter_status === 'EM_ATENDIMENTO';
   return showsEncounterStage ? entry.encounter_status_label : entry.status_label;
 }
 
