@@ -33,5 +33,5 @@ class Command(BaseCommand):
             )
 
         seed_demo_data(password)
-        usernames = ", ".join(username for username, *_ in DEMO_USERS)
+        usernames = ", ".join(demo.username for demo in DEMO_USERS)
         self.stdout.write(self.style.SUCCESS(f"Dados fictícios criados. Usuários: {usernames}"))
