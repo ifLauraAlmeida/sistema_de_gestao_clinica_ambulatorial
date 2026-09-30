@@ -48,6 +48,7 @@ class AccessPermission(StrEnum):
     CATALOG_VIEW = "catalog.view"
 
     BILLING_VIEW_HISTORY = "billing.view_history"
+    BILLING_MANAGE = "billing.manage"
 
     REPORTS_VIEW_OWN = "reports.view_own"
     REPORTS_VIEW_ALL = "reports.view_all"

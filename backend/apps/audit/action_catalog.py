@@ -58,6 +58,8 @@ _ACTIONS: Mapping[str, tuple[str, AuditCategory]] = {
     A.PROCEDURE_RECORD_VIEW_GRANTED: ("Procedimento aberto", AuditCategory.CLINICAL),
     A.PROCEDURE_RECORD_VIEW_DENIED: ("Procedimento negado", AuditCategory.CLINICAL),
     A.PROCEDURE_RECORD_SAVED: ("Procedimento registrado", AuditCategory.CLINICAL),
+    A.BILLING_PAYMENT_CONFIRMED: ("Pagamento confirmado", AuditCategory.FINANCIAL),
+    A.BILLING_AUTHORIZATION_RELEASED: ("Atendimento liberado (convênio)", AuditCategory.FINANCIAL),
     A.AUDIT_VIEWED: ("Auditoria consultada", AuditCategory.AUDIT),
     A.AUDIT_EXPORTED: ("Auditoria exportada", AuditCategory.AUDIT),
 }

@@ -15,6 +15,7 @@ api_v1_patterns = [
     path("", include("apps.queues.urls")),
     path("", include("apps.medical_records.urls")),
     path("", include("apps.procedures.urls")),
+    path("", include("apps.billing.urls")),
     path("", include("apps.audit.urls")),
 ]
 
