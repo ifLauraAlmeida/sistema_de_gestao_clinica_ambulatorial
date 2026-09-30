@@ -7,6 +7,8 @@ export interface CatalogService {
   service_type: ServiceType;
   service_type_label: string;
   duration_minutes: number;
+  /** Preço de referência ("150.00"); null quando ainda não definido. */
+  reference_price: string | null;
   requires_laterality: boolean;
   allows_sedation: boolean;
   is_laboratory_collection: boolean;

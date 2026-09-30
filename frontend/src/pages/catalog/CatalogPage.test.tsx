@@ -30,6 +30,7 @@ describe('CatalogPage', () => {
                     service_type: 'EXAME',
                     service_type_label: 'Exame',
                     duration_minutes: 45,
+                    reference_price: '310.00',
                     requires_laterality: false,
                     allows_sedation: false,
                     is_laboratory_collection: false,
@@ -67,6 +68,7 @@ describe('CatalogPage', () => {
     await userEvent.type(await screen.findByLabelText('Buscar serviço'), 'ergometria');
     expect(screen.getByText('Teste ergométrico')).toBeInTheDocument();
     expect(screen.getByText('45 min')).toBeInTheDocument();
+    expect(screen.getByText(/R\$\s310,00/)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('tab', { name: 'Exames laboratoriais' }));
     const [groupSummary] = await screen.findAllByText('Glicemia e metabolismo');

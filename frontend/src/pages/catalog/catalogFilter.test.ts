@@ -8,6 +8,7 @@ const service = (name: string, aliases: string[] = []): CatalogService => ({
   service_type: 'EXAME',
   service_type_label: 'Exame',
   duration_minutes: 30,
+  reference_price: null,
   requires_laterality: false,
   allows_sedation: false,
   is_laboratory_collection: false,

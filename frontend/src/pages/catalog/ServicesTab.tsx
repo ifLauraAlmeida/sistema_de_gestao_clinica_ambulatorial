@@ -7,6 +7,7 @@ import { Table } from '../../components/ui/Table';
 import { TextField } from '../../components/ui/TextField';
 import { useApiResource } from '../../hooks/useApiResource';
 import { getCatalogTree } from '../../services/catalog';
+import { formatCurrency } from '../../utils/currency';
 import type { CatalogService, ServiceType } from '../../types/catalog';
 import { countServices, filterCatalog } from './catalogFilter';
 import styles from './CatalogPage.module.css';
@@ -72,6 +73,12 @@ export function ServicesTab(): ReactElement {
                     key: 'duration',
                     header: 'Duração',
                     render: (s) => `${s.duration_minutes} min`,
+                  },
+                  {
+                    key: 'price',
+                    header: 'Valor',
+                    align: 'right',
+                    render: (s) => formatCurrency(s.reference_price),
                   },
                   { key: 'attributes', header: 'Atributos', render: attributesOf },
                   {
