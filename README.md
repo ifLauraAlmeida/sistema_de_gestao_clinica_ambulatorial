@@ -34,6 +34,33 @@ O escopo funcional completo está em [`references/escopo_sistema.md`](references
 
 **Ainda não implementado** (próximas etapas): prontuário completo, financeiro para a recepção (perfil de autorização) e bloqueio da fila por pendência financeira, prescrição, documentos e assinatura, faturamento de convênios (lotes, glosas), painel público e eventos WebSocket, relatórios, integrações externas, multiunidade.
 
+## Como funciona
+
+Jornada do paciente, do agendamento à finalização:
+
+```mermaid
+flowchart LR
+    A[Agendamento] --> B[Check-in<br/>senha por especialidade]
+    B --> C[Fila da recepção<br/>chamada com guichê]
+    C --> D[Encaminhamento]
+    D --> E[Fila clínica<br/>chamada com sala]
+    E --> F[Atendimento<br/>prontuário e evolução]
+    F --> G[Finalizado<br/>fila inativa]
+    C -. pagamento / guia .-> H[Financeiro]
+    B & C & E & F & H -.-> I[(Auditoria)]
+```
+
+Todas as telas abaixo usam **dados fictícios** (`make seed` + `make seed-history`).
+
+| | |
+|---|---|
+| ![Login](docs/imagens/01-login.png) Login | ![Painel da recepção](docs/imagens/02-recepcao-painel.png) Painel da recepção |
+| ![Check-in](docs/imagens/03-check-in.png) Check-in e geração de senha | ![Fila da recepção](docs/imagens/04-fila-recepcao.png) Fila da recepção com escolha da senha |
+| ![Agenda](docs/imagens/05-agenda.png) Agenda de consultas | ![Fila clínica](docs/imagens/06-fila-clinica.png) Fila clínica do profissional |
+| ![Atendimento](docs/imagens/07-atendimento.png) Prontuário e atendimento | ![Painel do gestor](docs/imagens/08-gestor-painel.png) Painel do gestor |
+| ![Financeiro](docs/imagens/09-financeiro.png) Financeiro e autorizações | ![Auditoria](docs/imagens/10-auditoria.png) Auditoria |
+| ![Catálogo](docs/imagens/11-catalogo.png) Catálogo com valores | |
+
 ---
 
 ## Stack
