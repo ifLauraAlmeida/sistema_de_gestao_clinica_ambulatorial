@@ -28,9 +28,11 @@ O escopo funcional completo está em [`references/escopo_sistema.md`](references
 - tela de auditoria (gestor): filtros, detalhes, indicadores e exportação em CSV;
 - fila clínica do médico (chamar, iniciar, abrir atendimento) e visão das filas pelo gestor;
 - tela de prontuário e atendimento: evolução, histórico clínico anterior e finalização (acesso revogado após ATENDIDO);
+- catálogo de serviços com valores, pacotes, exames laboratoriais e formulários de execução por procedimento;
+- histórico fictício de 4 meses para demonstração (`make seed-history`);
 - testes automatizados (incluindo os 30 cenários de autorização), lint e Docker.
 
-**Ainda não implementado** (próximas etapas): prontuário completo, financeiro para a recepção (perfil de autorização) e bloqueio da fila por pendência financeira, prescrição, documentos e assinatura, financeiro e convênios, painel público e eventos WebSocket, relatórios, integrações externas, multiunidade.
+**Ainda não implementado** (próximas etapas): prontuário completo, financeiro para a recepção (perfil de autorização) e bloqueio da fila por pendência financeira, prescrição, documentos e assinatura, faturamento de convênios (lotes, glosas), painel público e eventos WebSocket, relatórios, integrações externas, multiunidade.
 
 ---
 
