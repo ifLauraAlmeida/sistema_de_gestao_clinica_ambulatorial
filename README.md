@@ -203,7 +203,7 @@ Gera ~4 meses de dias úteis passados (domingo sem atendimento, sábado reduzido
 docker compose run --rm backend python manage.py load_service_catalog
 ```
 
-Cria ou atualiza especialidades, formulários de execução, serviços, exames laboratoriais e pacotes (`backend/apps/catalog/catalog_data.py`). Pode ser executado em produção e várias vezes: preços de referência e pacotes ajustados pelo gestor no `/admin` não são sobrescritos. Durações e preparos são sugestões iniciais a revisar. "Pesquisa de refluxo" não foi cadastrada até a clínica informar o nome técnico do exame.
+Cria ou atualiza especialidades, formulários de execução, serviços, exames laboratoriais e pacotes (`backend/apps/catalog/catalog_data.py`). Pode ser executado em produção e várias vezes: preços de referência e pacotes ajustados pelo gestor no `/admin` não são sobrescritos. Durações e preparos são sugestões iniciais a revisar. O preço de referência aparece na coluna **Valor** da tela Catálogo para todo perfil com acesso a ela; o `make seed` preenche valores **fictícios** (por área) apenas nos serviços ainda sem preço. "Pesquisa de refluxo" não foi cadastrada até a clínica informar o nome técnico do exame.
 
 ### 4. Superusuário
 
