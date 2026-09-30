@@ -6,6 +6,8 @@ export interface TableColumn<Row> {
   header: string;
   render: (row: Row, index: number) => ReactNode;
   align?: 'left' | 'right';
+  /** Permite quebra de linha (textos longos); por padrão as células não quebram. */
+  wrap?: boolean;
 }
 
 interface TableProps<Row> {
@@ -43,7 +45,10 @@ export function Table<Row>({
           {rows.map((row, index) => (
             <tr key={getRowKey(row)}>
               {columns.map((column) => (
-                <td key={column.key} className={styles[column.align ?? 'left']}>
+                <td
+                  key={column.key}
+                  className={`${styles[column.align ?? 'left']} ${column.wrap ? styles.wrap : ''}`}
+                >
                   {column.render(row, index)}
                 </td>
               ))}

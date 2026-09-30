@@ -39,3 +39,8 @@
 .right {
   text-align: right;
 }
+
+.table td.wrap {
+  min-width: 180px;
+  white-space: normal;
+}

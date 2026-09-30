@@ -28,3 +28,9 @@
   display: inline-flex;
   color: var(--color-pen-blue);
 }
+
+.subtitle {
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}

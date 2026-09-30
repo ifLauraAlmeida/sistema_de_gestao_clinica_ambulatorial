@@ -65,3 +65,20 @@
 .danger .value {
   color: var(--color-red-600);
 }
+
+.trend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.favorable {
+  color: var(--color-green-600);
+}
+
+.unfavorable {
+  color: var(--color-red-600);
+}

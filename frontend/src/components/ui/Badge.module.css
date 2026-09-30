@@ -1,6 +1,7 @@
 .badge {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   padding: 2px var(--space-3);
   border-radius: var(--radius-pill);
   font-size: var(--font-size-xs);
@@ -31,4 +32,11 @@
 .neutral {
   background: var(--color-gray-100);
   color: var(--color-gray-600);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
 }
