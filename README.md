@@ -175,6 +175,15 @@ make seed
 
 Carrega o catálogo e cria usuários de todos os perfis (tabela abaixo), guichês, consultórios, salas de exames, pacientes **fictícios** (sem CPF, telefones com DDD 00) e a agenda do dia por serviço, com parte dos pacientes em fila. O comando recusa execução com `DJANGO_DEBUG=false`. A agenda por serviço é criada uma vez por dia: rode `make seed` a cada novo dia de testes.
 
+### Histórico fictício (4 meses)
+
+```bash
+make seed-history
+# ou: docker compose run --rm backend python manage.py seed_demo_history --months 4 --future-days 14
+```
+
+Gera ~4 meses de dias úteis passados (domingo sem atendimento, sábado reduzido) e a agenda das próximas duas semanas, para avaliar telas com volume: agendamentos cancelados e faltas, check-in, senhas e chamadas (com rechamadas), atendimentos finalizados, evoluções e registros de procedimento, situação financeira (pago/liberado/pendente) e toda a trilha de auditoria (logins, sessões de posto, negações ocasionais). Pacientes extras levam o sufixo "(fictício)". Os registros são gravados em lote com as datas do passado, respeitando as constraints do banco. Não repete: se já houver histórico com mais de uma semana, nada é feito. Exige DEBUG e `make seed` antes (o alvo já depende dele).
+
 | Usuário | Perfil | Atua em |
 |---|---|---|
 | `recepcao.demo`, `recepcao2.demo` | Atendente | guichês |
@@ -373,7 +382,7 @@ Guichê e consultório **não** são atributos do usuário. Após o login, atend
 
 ## Financeiro e autorizações
 
-Tela do gestor (Tela 09). Cada atendimento do dia tem situação **Pendente**, **Pago** (pagamento particular ou coparticipação, com forma de pagamento) ou **Liberado** (guia autorizada do convênio). O valor sugerido é o preço de referência do serviço. Constraints no banco garantem convênio coerente com o pagador, forma de pagamento quando pago e número da guia quando liberado; cada mudança fica na auditoria com situação e valor anteriores e novos.
+Tela do gestor (Tela 09), com seletor de data para consultar dias anteriores. Cada atendimento do dia tem situação **Pendente**, **Pago** (pagamento particular ou coparticipação, com forma de pagamento) ou **Liberado** (guia autorizada do convênio). O valor sugerido é o preço de referência do serviço. Constraints no banco garantem convênio coerente com o pagador, forma de pagamento quando pago e número da guia quando liberado; cada mudança fica na auditoria com situação e valor anteriores e novos.
 
 Decisão desta etapa: a situação financeira **ainda não bloqueia** o encaminhamento para a fila do profissional, pois a recepção não opera o financeiro. Isso deve ser ligado junto com o perfil de recepção financeira previsto no escopo (seção 5.4).
 
