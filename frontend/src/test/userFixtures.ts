@@ -55,6 +55,8 @@ const ROLE_PERMISSIONS: Record<UserRole, AccessPermission[]> = {
     'medical_record.view_any',
     'procedure_record.view_any',
     'catalog.view',
+    'billing.view_history',
+    'billing.manage',
     'audit.view',
     'work_session.reception_desk',
     'work_session.consultation_room',

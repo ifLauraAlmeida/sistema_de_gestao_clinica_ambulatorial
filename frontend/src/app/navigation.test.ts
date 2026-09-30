@@ -26,7 +26,8 @@ describe('menu por permissões', () => {
     expect(labelsFor('TECNICO')).toEqual(['Dashboard', 'Fila clínica']);
   });
 
-  it('gestor vê auditoria', () => {
+  it('gestor vê auditoria e financeiro', () => {
     expect(labelsFor('GESTOR')).toContain('Auditoria');
+    expect(labelsFor('GESTOR')).toContain('Financeiro e Autorizações');
   });
 });

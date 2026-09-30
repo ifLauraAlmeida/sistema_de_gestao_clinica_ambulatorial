@@ -28,6 +28,7 @@ export type AccessPermission =
   | 'procedure_record.view_any'
   | 'catalog.view'
   | 'billing.view_history'
+  | 'billing.manage'
   | 'reports.view_own'
   | 'reports.view_all'
   | 'users.manage'

@@ -2,11 +2,13 @@ import type { ReactElement } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { MainLayout } from '../layouts/MainLayout';
 import { AgendaPage } from '../pages/agenda/AgendaPage';
+import { AuditPage } from '../pages/audit/AuditPage';
 import { CatalogPage } from '../pages/catalog/CatalogPage';
 import { CheckInPage } from '../pages/checkIn/CheckInPage';
 import { ClinicalQueuePage } from '../pages/clinicalQueue/ClinicalQueuePage';
 import { DashboardPage } from '../pages/dashboard/DashboardPage';
 import { EncounterPage } from '../pages/encounter/EncounterPage';
+import { FinancePage } from '../pages/finance/FinancePage';
 import { PatientsPage } from '../pages/patients/PatientsPage';
 import { ReceptionQueuePage } from '../pages/receptionQueue/ReceptionQueuePage';
 import { LoginPage } from '../pages/login/LoginPage';
@@ -29,11 +31,11 @@ const MODULE_PAGES: Record<string, ReactElement> = {
   '/fila-recepcao': <ReceptionQueuePage />,
   '/fila-clinica': <ClinicalQueuePage />,
   '/catalogo': <CatalogPage />,
+  '/financeiro': <FinancePage />,
+  '/auditoria': <AuditPage />,
 };
 
-const PLACEHOLDER_DESCRIPTIONS: Record<string, string> = {
-  '/auditoria': 'Consulta dos eventos de auditoria.',
-};
+const PLACEHOLDER_DESCRIPTIONS: Record<string, string> = {};
 
 /** Página do módulo, ou tela reservada quando o módulo ainda não foi implementado. */
 function moduleElementFor(item: NavigationItem): ReactElement {

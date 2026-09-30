@@ -2,6 +2,7 @@ import {
   CalendarDays,
   BookOpen,
   ClipboardCheck,
+  CreditCard,
   LayoutDashboard,
   ListOrdered,
   ShieldCheck,
@@ -42,6 +43,12 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     anyOf: ['clinical_queue.view_own', 'clinical_queue.view_all'],
   },
   { label: 'Catálogo de serviços', path: '/catalogo', icon: BookOpen, anyOf: ['catalog.view'] },
+  {
+    label: 'Financeiro e Autorizações',
+    path: '/financeiro',
+    icon: CreditCard,
+    anyOf: ['billing.view_history'],
+  },
   { label: 'Auditoria', path: '/auditoria', icon: ShieldCheck, anyOf: ['audit.view'] },
 ];
 
