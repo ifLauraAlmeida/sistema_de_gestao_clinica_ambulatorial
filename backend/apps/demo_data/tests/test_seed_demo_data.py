@@ -3,6 +3,7 @@ from django.core.management import CommandError, call_command
 from django.test import override_settings
 
 from apps.accounts.models import User
+from apps.billing.models import EncounterBilling
 from apps.catalog.models import Service
 from apps.patients.models import Patient
 from apps.queues.models import QueueEntry
@@ -33,6 +34,9 @@ def test_seed_creates_fictitious_flow_and_is_idempotent():
     collection = Appointment.objects.get(service__name="Coleta de exames laboratoriais")
     assert collection.laboratory_exams.count() == 3
     assert Service.objects.count() > 150
+    assert EncounterBilling.objects.filter(status="PAGO").count() == 2
+    assert EncounterBilling.objects.filter(status="LIBERADO").count() == 2
+    assert Service.objects.get(name="Raio-X de joelho").reference_price == 150
     assert User.objects.get(username="recepcao.demo").check_password(PASSWORD)
     assert not Patient.objects.filter(phone="").exists()
 

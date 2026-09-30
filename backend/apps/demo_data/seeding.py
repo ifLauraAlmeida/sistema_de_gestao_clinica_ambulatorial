@@ -1,20 +1,28 @@
 """Criação idempotente do cenário de demonstração."""
 
 from datetime import date, datetime, time, timedelta
+from decimal import Decimal
 
 from django.db import transaction
 from django.utils import timezone
 
 from apps.accounts.models import User, UserRole
+from apps.billing.models import EncounterBilling, HealthInsurer, PaymentMethod
+from apps.billing.services import confirm_payment, release_authorization
 from apps.catalog.catalog_loader import load_service_catalog
 from apps.catalog.models import LaboratoryExam, Service
 from apps.demo_data.fictitious_records import (
+    DEMO_BILLINGS,
+    DEMO_INSURERS,
     DEMO_PATIENTS,
+    DEMO_REFERENCE_PRICES,
     DEMO_STATIONS,
     DEMO_TODAY_AGENDA,
     DEMO_USERS,
+    DemoBilling,
     DemoUser,
 )
+from apps.encounters.models import Encounter
 from apps.encounters.services.check_in import check_in_appointment
 from apps.patients.models import Patient
 from apps.professionals.models import Professional, Specialty
@@ -41,6 +49,9 @@ def seed_demo_data(password: str) -> None:
     """
     with transaction.atomic():
         load_service_catalog()
+        _ensure_reference_prices()
+        for insurer_name in DEMO_INSURERS:
+            HealthInsurer.objects.get_or_create(name=insurer_name)
         users = {demo.username: _ensure_user(demo, password) for demo in DEMO_USERS}
         for demo in DEMO_USERS:
             if demo.specialty_prefixes:
@@ -54,6 +65,7 @@ def seed_demo_data(password: str) -> None:
             scheduled_for__date=today, service__isnull=False
         ).exists():
             _create_todays_flow(today, patients, users)
+        _ensure_demo_billing(today, users["gestao.demo"])
 
 
 def _ensure_user(demo: DemoUser, password: str) -> User:
@@ -106,3 +118,44 @@ def _create_todays_flow(today: date, patients: list[Patient], users: dict[str, U
         if index < FORWARDED_COUNT:
             entry = QueueEntry.objects.get(encounter=encounter, queue_type=QueueType.RECEPTION)
             forward_to_clinical_queue(entry.id, forwarded_by=receptionist)
+
+
+def _ensure_reference_prices() -> None:
+    for service_name, price in DEMO_REFERENCE_PRICES.items():
+        Service.objects.filter(name=service_name, reference_price__isnull=True).update(
+            reference_price=Decimal(price)
+        )
+
+
+def _ensure_demo_billing(today: date, gestor: User) -> None:
+    """Aplica situações financeiras aos primeiros atendimentos do dia (uma vez por dia)."""
+    if EncounterBilling.objects.filter(encounter__service_date=today).exists():
+        return
+    encounters = Encounter.objects.filter(service_date=today, service__isnull=False).order_by(
+        "checked_in_at"
+    )[: len(DEMO_BILLINGS)]
+    for encounter, plan in zip(encounters, DEMO_BILLINGS, strict=False):
+        _settle_demo(encounter, plan, gestor)
+
+
+def _settle_demo(encounter: Encounter, plan: DemoBilling, gestor: User) -> None:
+    amount = encounter.service.reference_price if encounter.service else None
+    amount = amount or Decimal("0")
+    insurer = HealthInsurer.objects.get(name=plan.insurer) if plan.insurer else None
+    if plan.status == "LIBERADO" and insurer:
+        release_authorization(
+            encounter.id,
+            insurer=insurer,
+            guide_number=plan.guide_number,
+            amount=amount,
+            released_by=gestor,
+        )
+        return
+    confirm_payment(
+        encounter.id,
+        insurer=insurer,
+        guide_number=plan.guide_number,
+        payment_method=PaymentMethod(plan.payment_method),
+        amount=amount,
+        confirmed_by=gestor,
+    )

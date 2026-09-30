@@ -81,3 +81,40 @@ DEMO_TODAY_AGENDA: tuple[DemoAppointment, ...] = (
     DemoAppointment("tecnico.rx", "Mamografia bilateral"),
     DemoAppointment("psico.demo", "Sessão de psicologia individual"),
 )
+
+# Convênios fictícios (não usar nomes de operadoras reais na demonstração).
+DEMO_INSURERS: tuple[str, ...] = (
+    "Convênio Alfa Saúde",
+    "Convênio Beta Vida",
+    "Plano Gama Assistência",
+)
+
+# Preços de referência fictícios, aplicados só se o gestor ainda não definiu.
+DEMO_REFERENCE_PRICES: dict[str, str] = {
+    "Consulta pediátrica — primeira consulta": "280.00",
+    "Consulta ortopédica — primeira consulta": "350.00",
+    "Raio-X de joelho": "150.00",
+    "Coleta de exames laboratoriais": "90.00",
+    "Bioimpedância": "120.00",
+    "Ultrassonografia de abdome total": "310.00",
+    "Mamografia bilateral": "260.00",
+    "Sessão de psicologia individual": "200.00",
+}
+
+
+@dataclass(frozen=True)
+class DemoBilling:
+    """Situação financeira aplicada aos primeiros atendimentos do dia."""
+
+    status: str  # "PAGO" | "LIBERADO"
+    insurer: str | None = None
+    guide_number: str = ""
+    payment_method: str = ""
+
+
+DEMO_BILLINGS: tuple[DemoBilling, ...] = (
+    DemoBilling("PAGO", payment_method="PIX"),
+    DemoBilling("LIBERADO", "Convênio Alfa Saúde", "1234567"),
+    DemoBilling("PAGO", payment_method="CARTAO_CREDITO"),
+    DemoBilling("LIBERADO", "Convênio Beta Vida", "7654321"),
+)
