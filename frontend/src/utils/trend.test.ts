@@ -16,7 +16,7 @@ describe('compareWithPreviousDay', () => {
   });
 
   it('não divide por zero quando ontem não houve registros', () => {
-    expect(compareWithPreviousDay(3, 0, true).label).toBe('sem registros ontem');
+    expect(compareWithPreviousDay(3, 0, true).label).toBe('sem registros no dia anterior');
     expect(compareWithPreviousDay(0, 0, true).label).toBe('sem variação');
   });
 });

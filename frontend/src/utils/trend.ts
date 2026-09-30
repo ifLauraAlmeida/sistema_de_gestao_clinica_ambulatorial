@@ -12,12 +12,17 @@ export function compareWithPreviousDay(
   current: number,
   previous: number,
   higherIsBetter: boolean,
+  caption = 'em relação a ontem',
 ): KpiTrend {
-  const caption = 'em relação a ontem';
   if (previous === 0) {
     return current === 0
       ? { label: 'sem variação', direction: 'flat', isFavorable: true, caption }
-      : { label: 'sem registros ontem', direction: 'up', isFavorable: higherIsBetter, caption };
+      : {
+          label: 'sem registros no dia anterior',
+          direction: 'up',
+          isFavorable: higherIsBetter,
+          caption,
+        };
   }
   const percent = Math.round(((current - previous) / previous) * 100);
   if (percent === 0) return { label: '0%', direction: 'flat', isFavorable: true, caption };

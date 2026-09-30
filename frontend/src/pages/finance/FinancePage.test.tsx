@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FakeBackend } from '../../test/FakeBackend';
@@ -118,5 +118,22 @@ describe('FinancePage', () => {
     renderApp('/financeiro');
 
     expect(await screen.findByText('Acesso não permitido')).toBeInTheDocument();
+  });
+
+  it('consulta o financeiro de uma data anterior', async () => {
+    const backend = financeBackend();
+    backend.install();
+    renderApp('/financeiro');
+
+    const dateInput = await screen.findByLabelText('Data');
+    // Inputs de data no jsdom não aceitam digitação caractere a caractere.
+    fireEvent.change(dateInput, { target: { value: '2026-08-15' } });
+
+    await waitFor(() =>
+      expect(backend.requests.map((request) => request.path)).toContain(
+        '/api/v1/billing/day/?date=2026-08-15',
+      ),
+    );
+    expect(await screen.findByText(/atendimentos de 15\/08\/2026/)).toBeInTheDocument();
   });
 });

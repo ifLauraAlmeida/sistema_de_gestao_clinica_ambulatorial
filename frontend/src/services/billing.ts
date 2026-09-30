@@ -5,10 +5,11 @@ import type {
   HealthInsurer,
   PaymentInput,
 } from '../types/billing';
-import { apiClient } from './api';
+import { apiClient, withQuery } from './api';
 
-export function getBillingDay(): Promise<BillingDay> {
-  return apiClient.get('/billing/day/');
+/** Financeiro de uma data ("2026-09-29"); sem data, o dia atual. */
+export function getBillingDay(date?: string): Promise<BillingDay> {
+  return apiClient.get(withQuery('/billing/day/', { date }));
 }
 
 export function listInsurers(): Promise<HealthInsurer[]> {
