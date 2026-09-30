@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 from django.db import IntegrityError
 
@@ -17,7 +19,15 @@ def test_services_are_found_by_synonym(client_for, atendente):
     [found] = response.json()
     assert found["name"] == "Teste ergométrico"
     assert found["aliases"] == ["Ergometria"]
-    assert "reference_price" not in found
+    assert found["reference_price"] is None
+
+
+def test_any_catalog_profile_sees_reference_price(client_for, atendente):
+    create_service("Raio-X de joelho", reference_price=Decimal("150.00"))
+
+    [found] = client_for(atendente).get("/api/v1/catalog/services/").json()
+
+    assert found["reference_price"] == "150.00"
 
 
 def test_inactive_services_are_hidden(client_for, atendente):

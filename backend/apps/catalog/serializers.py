@@ -12,7 +12,13 @@ from apps.catalog.models import (
 
 
 class ServiceSerializer(serializers.ModelSerializer[Service]):
-    """Serviço do catálogo para consulta e agendamento (sem preço)."""
+    """
+    Serviço do catálogo para consulta e agendamento.
+
+    O preço de referência é visível a todo perfil com acesso ao catálogo
+    (decisão do produto: a equipe informa valores ao paciente); valores
+    efetivamente cobrados continuam restritos ao financeiro do gestor.
+    """
 
     service_type_label = serializers.CharField(source="get_service_type_display", read_only=True)
     specialty_id = serializers.UUIDField(source="specialty.id", read_only=True)
@@ -30,6 +36,7 @@ class ServiceSerializer(serializers.ModelSerializer[Service]):
             "service_type",
             "service_type_label",
             "duration_minutes",
+            "reference_price",
             "requires_laterality",
             "allows_sedation",
             "is_laboratory_collection",
