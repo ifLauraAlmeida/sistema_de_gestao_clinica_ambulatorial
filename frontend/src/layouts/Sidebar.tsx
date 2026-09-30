@@ -5,11 +5,22 @@ import { getVisibleNavigationItems } from '../app/navigation';
 import { useCurrentUser } from '../hooks/useAuth';
 import styles from './Sidebar.module.css';
 
-export function Sidebar(): ReactElement {
+export const SIDEBAR_ID = 'menu-lateral';
+
+/**
+ * Menu lateral. Recolhido, desliza para fora da tela e fica inerte: não recebe
+ * foco pelo teclado nem é lido por leitores de tela.
+ */
+export function Sidebar({ isOpen }: { isOpen: boolean }): ReactElement {
   const user = useCurrentUser();
 
   return (
-    <aside className={styles.sidebar}>
+    <aside
+      id={SIDEBAR_ID}
+      className={`${styles.sidebar} ${isOpen ? '' : styles.closed}`}
+      aria-hidden={!isOpen}
+      inert={!isOpen}
+    >
       <div className={styles.brand}>
         <span className={styles.brandIcon} aria-hidden="true">
           <Activity size={22} />

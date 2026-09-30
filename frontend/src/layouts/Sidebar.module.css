@@ -1,5 +1,9 @@
 .sidebar {
   display: flex;
+  overflow: hidden;
+  transition:
+    margin-left 220ms ease,
+    visibility 220ms;
   flex-direction: column;
   gap: var(--space-6);
   width: var(--sidebar-width);
@@ -59,4 +63,10 @@
   background: var(--color-blue-500);
   color: var(--color-white);
   font-weight: 600;
+}
+
+/* Recolhido: desliza para a esquerda liberando a largura para o conteúdo. */
+.closed {
+  margin-left: calc(-1 * var(--sidebar-width));
+  visibility: hidden;
 }

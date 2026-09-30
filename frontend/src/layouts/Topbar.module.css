@@ -55,3 +55,21 @@
   font-size: var(--font-size-xs);
   color: var(--text-muted);
 }
+
+.menuToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-right: var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-pen-blue);
+  cursor: pointer;
+}
+
+.menuToggle:hover {
+  background: var(--color-blue-50);
+}

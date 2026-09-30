@@ -1,12 +1,18 @@
 import { useState, type ReactElement } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { DoorOpen, LogOut } from 'lucide-react';
+import { DoorOpen, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useAuth, useCurrentUser } from '../hooks/useAuth';
 import { initialsOf } from '../utils/userAccess';
 import styles from './Topbar.module.css';
 
-export function Topbar(): ReactElement {
+interface TopbarProps {
+  isSidebarOpen: boolean;
+  sidebarId: string;
+  onToggleSidebar: () => void;
+}
+
+export function Topbar({ isSidebarOpen, sidebarId, onToggleSidebar }: TopbarProps): ReactElement {
   const user = useCurrentUser();
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -22,6 +28,17 @@ export function Topbar(): ReactElement {
   return (
     <header className={styles.topbar} aria-label="Barra superior">
       <div className={styles.station}>
+        <button
+          type="button"
+          className={styles.menuToggle}
+          onClick={onToggleSidebar}
+          aria-expanded={isSidebarOpen}
+          aria-controls={sidebarId}
+          title={isSidebarOpen ? 'Recolher menu' : 'Abrir menu'}
+        >
+          {isSidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}
+          <span className="visually-hidden">{isSidebarOpen ? 'Recolher menu' : 'Abrir menu'}</span>
+        </button>
         <DoorOpen size={18} aria-hidden="true" />
         <span>
           {station ? (
