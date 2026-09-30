@@ -37,6 +37,7 @@ def test_seed_creates_fictitious_flow_and_is_idempotent():
     assert EncounterBilling.objects.filter(status="PAGO").count() == 2
     assert EncounterBilling.objects.filter(status="LIBERADO").count() == 2
     assert Service.objects.get(name="Raio-X de joelho").reference_price == 150
+    assert not Service.objects.filter(reference_price__isnull=True).exists()
     assert User.objects.get(username="recepcao.demo").check_password(PASSWORD)
     assert not Patient.objects.filter(phone="").exists()
 

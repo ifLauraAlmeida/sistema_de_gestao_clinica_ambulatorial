@@ -156,28 +156,6 @@ PROFESSIONAL_PLANS: tuple[ProfessionalPlan, ...] = (
     ),
 )
 
-# Preços fictícios de referência (aplicados só se ainda não definidos).
-HISTORY_REFERENCE_PRICES: dict[str, str] = {
-    "Consulta pediátrica — retorno": "180.00",
-    "Consulta pediátrica de acompanhamento": "220.00",
-    "Ultrassonografia de tireoide": "230.00",
-    "Doppler venoso de membros inferiores": "420.00",
-    "Consulta ortopédica — retorno": "220.00",
-    "Avaliação ortopédica": "250.00",
-    "Imobilização ortopédica": "180.00",
-    "Consulta de Nutrição — primeira consulta": "240.00",
-    "Consulta de Nutrição — retorno": "160.00",
-    "Consulta odontológica — avaliação": "150.00",
-    "Profilaxia / limpeza dentária": "180.00",
-    "Restauração dentária": "260.00",
-    "Avaliação psicológica inicial": "250.00",
-    "Audiometria tonal limiar": "130.00",
-    "Imitanciometria completa": "120.00",
-    "Raio-X de tórax PA": "90.00",
-    "Raio-X de coluna lombar": "130.00",
-    "Densitometria óssea — coluna + fêmur": "240.00",
-}
-
 # Probabilidades de desfecho de um agendamento passado.
 CANCELLED_RATE = 0.05
 NO_SHOW_BEFORE_ARRIVAL_RATE = 0.07

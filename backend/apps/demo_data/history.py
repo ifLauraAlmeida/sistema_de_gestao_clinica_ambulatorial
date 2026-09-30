@@ -9,7 +9,6 @@ Somente para desenvolvimento/demonstração: o comando exige DEBUG.
 import random
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
-from decimal import Decimal
 
 from django.db import transaction
 from django.utils import timezone
@@ -25,7 +24,6 @@ from apps.demo_data.history_records import (
     FIRST_NAMES,
     GESTOR_USERNAME,
     HISTORY_PATIENT_COUNT,
-    HISTORY_REFERENCE_PRICES,
     LAST_NAMES,
     NO_SHOW_BEFORE_ARRIVAL_RATE,
     PROFESSIONAL_PLANS,
@@ -113,7 +111,6 @@ def _build_context(rng: random.Random) -> HistoryContext:
             f"Usuários de demonstração ausentes: {', '.join(sorted(missing))}. "
             "Execute seed_demo_data antes de gerar o histórico."
         )
-    _ensure_reference_prices()
     return HistoryContext(
         rng=rng,
         users=users,
@@ -128,13 +125,6 @@ def _build_context(rng: random.Random) -> HistoryContext:
         laboratory_exams=list(LaboratoryExam.objects.filter(is_active=True)),
         patients=_ensure_history_patients(rng),
     )
-
-
-def _ensure_reference_prices() -> None:
-    for name, price in HISTORY_REFERENCE_PRICES.items():
-        Service.objects.filter(name=name, reference_price__isnull=True).update(
-            reference_price=Decimal(price)
-        )
 
 
 def _ensure_history_patients(rng: random.Random) -> list[Patient]:

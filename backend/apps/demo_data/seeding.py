@@ -1,5 +1,6 @@
 """Criação idempotente do cenário de demonstração."""
 
+import zlib
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 
@@ -13,6 +14,8 @@ from apps.catalog.catalog_loader import load_service_catalog
 from apps.catalog.models import LaboratoryExam, Service
 from apps.demo_data.fictitious_records import (
     DEMO_BILLINGS,
+    DEMO_CATEGORY_PRICE_RANGES,
+    DEMO_DEFAULT_PRICE_RANGE,
     DEMO_INSURERS,
     DEMO_PATIENTS,
     DEMO_REFERENCE_PRICES,
@@ -121,10 +124,26 @@ def _create_todays_flow(today: date, patients: list[Patient], users: dict[str, U
 
 
 def _ensure_reference_prices() -> None:
+    """Preços fictícios para todo serviço sem preço; nunca sobrescreve o do gestor."""
     for service_name, price in DEMO_REFERENCE_PRICES.items():
         Service.objects.filter(name=service_name, reference_price__isnull=True).update(
             reference_price=Decimal(price)
         )
+    unpriced = Service.objects.filter(reference_price__isnull=True).select_related(
+        "group__category"
+    )
+    for service in unpriced:
+        service.reference_price = _fictitious_price(service)
+    Service.objects.bulk_update(unpriced, ["reference_price"])
+
+
+def _fictitious_price(service: Service) -> Decimal:
+    low, high = DEMO_CATEGORY_PRICE_RANGES.get(
+        service.group.category.name, DEMO_DEFAULT_PRICE_RANGE
+    )
+    # crc32 é estável entre execuções (hash() do Python não é).
+    steps = (high - low) // 10 + 1
+    return Decimal(low + zlib.crc32(service.name.encode()) % steps * 10)
 
 
 def _ensure_demo_billing(today: date, gestor: User) -> None:

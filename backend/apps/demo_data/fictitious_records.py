@@ -99,7 +99,43 @@ DEMO_REFERENCE_PRICES: dict[str, str] = {
     "Ultrassonografia de abdome total": "310.00",
     "Mamografia bilateral": "260.00",
     "Sessão de psicologia individual": "200.00",
+    "Consulta pediátrica — retorno": "180.00",
+    "Consulta pediátrica de acompanhamento": "220.00",
+    "Ultrassonografia de tireoide": "230.00",
+    "Doppler venoso de membros inferiores": "420.00",
+    "Consulta ortopédica — retorno": "220.00",
+    "Avaliação ortopédica": "250.00",
+    "Imobilização ortopédica": "180.00",
+    "Consulta de Nutrição — primeira consulta": "240.00",
+    "Consulta de Nutrição — retorno": "160.00",
+    "Consulta odontológica — avaliação": "150.00",
+    "Profilaxia / limpeza dentária": "180.00",
+    "Restauração dentária": "260.00",
+    "Avaliação psicológica inicial": "250.00",
+    "Audiometria tonal limiar": "130.00",
+    "Imitanciometria completa": "120.00",
+    "Raio-X de tórax PA": "90.00",
+    "Raio-X de coluna lombar": "130.00",
+    "Densitometria óssea — coluna + fêmur": "240.00",
 }
+
+# Faixa fictícia (mínimo, máximo) por área do catálogo, para os serviços sem
+# preço acima; o valor dentro da faixa é derivado do nome, então é estável.
+DEMO_CATEGORY_PRICE_RANGES: dict[str, tuple[int, int]] = {
+    "Consultas e atendimentos": (150, 350),
+    "Audiologia": (90, 180),
+    "Cardiologia": (150, 450),
+    "Densitometria óssea": (180, 280),
+    "Doppler": (300, 480),
+    "Endoscopia": (400, 900),
+    "Laboratório": (90, 90),
+    "Mamografia": (200, 350),
+    "Neurologia / Neurofisiologia": (250, 500),
+    "Pneumologia": (150, 350),
+    "Raios-X": (80, 180),
+    "Ultrassonografia": (180, 380),
+}
+DEMO_DEFAULT_PRICE_RANGE = (120, 300)
 
 
 @dataclass(frozen=True)
