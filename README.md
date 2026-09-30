@@ -24,11 +24,13 @@ O escopo funcional completo está em [`references/escopo_sistema.md`](references
 - login, layout principal e dashboard por perfil;
 - telas da recepção: resumo do dia, pacientes, agenda, check-in e fila da recepção;
 - chamada com escolha da senha (recepção e médico), não apenas da próxima;
+- financeiro e autorizações (gestor): pagamentos particulares e liberação por guia de convênio;
+- tela de auditoria (gestor): filtros, detalhes, indicadores e exportação em CSV;
 - fila clínica do médico (chamar, iniciar, abrir atendimento) e visão das filas pelo gestor;
 - tela de prontuário e atendimento: evolução, histórico clínico anterior e finalização (acesso revogado após ATENDIDO);
 - testes automatizados (incluindo os 30 cenários de autorização), lint e Docker.
 
-**Ainda não implementado** (próximas etapas): tela de auditoria, prontuário completo, prescrição, documentos e assinatura, financeiro e convênios, painel público e eventos WebSocket, relatórios, integrações externas, multiunidade.
+**Ainda não implementado** (próximas etapas): prontuário completo, financeiro para a recepção (perfil de autorização) e bloqueio da fila por pendência financeira, prescrição, documentos e assinatura, financeiro e convênios, painel público e eventos WebSocket, relatórios, integrações externas, multiunidade.
 
 ---
 
@@ -80,6 +82,7 @@ Cada domínio é um app Django em `backend/apps/`. Views apenas coordenam (valid
 | `catalog` | catálogo de serviços, sinônimos, formulários de execução, exames laboratoriais e pacotes |
 | `medical_records` | evolução clínica mínima e política de acesso ao prontuário |
 | `procedures` | registro versionado da execução do procedimento (campos do formulário do serviço) |
+| `billing` | convênios e financeiro de cada atendimento (pagamento particular ou guia de convênio) |
 | `demo_data` | comando de dados fictícios para desenvolvimento |
 
 ### Organização do frontend
@@ -350,7 +353,11 @@ Guichê e consultório **não** são atributos do usuário. Após o login, atend
 | POST | `/api/v1/encounters/{id}/complete/` | médico responsável |
 | GET | `/api/v1/encounters/{id}/medical-record/`, `/clinical-history/` | política contextual |
 | POST | `/api/v1/encounters/{id}/clinical-notes/` | política contextual |
-| GET | `/api/v1/audit/events/` | `audit.view` |
+| GET | `/api/v1/audit/events/?date_from=&date_to=&user=&category=&outcome=&search=` | `audit.view` |
+| GET | `/api/v1/audit/summary/` (indicadores; a consulta é auditada) | `audit.view` |
+| GET | `/api/v1/audit/events/export/` (CSV; a exportação é auditada) | `audit.view` |
+| GET | `/api/v1/billing/day/`, `/api/v1/billing/insurers/` | `billing.view_history` |
+| POST | `/api/v1/billing/encounters/{id}/payment/`, `/authorization/` | `billing.manage` |
 
 ---
 
@@ -363,6 +370,12 @@ Guichê e consultório **não** são atributos do usuário. Após o login, atend
 - Metadados nunca contêm senha, CPF completo ou conteúdo clínico.
 
 ---
+
+## Financeiro e autorizações
+
+Tela do gestor (Tela 09). Cada atendimento do dia tem situação **Pendente**, **Pago** (pagamento particular ou coparticipação, com forma de pagamento) ou **Liberado** (guia autorizada do convênio). O valor sugerido é o preço de referência do serviço. Constraints no banco garantem convênio coerente com o pagador, forma de pagamento quando pago e número da guia quando liberado; cada mudança fica na auditoria com situação e valor anteriores e novos.
+
+Decisão desta etapa: a situação financeira **ainda não bloqueia** o encaminhamento para a fila do profissional, pois a recepção não opera o financeiro. Isso deve ser ligado junto com o perfil de recepção financeira previsto no escopo (seção 5.4).
 
 ## Principais decisões arquiteturais
 
